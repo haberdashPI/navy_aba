@@ -3,7 +3,8 @@
 using Psychotask
 using Lazy: @>
 
-sid,trial_skip = @read_args("Runs an intermittent aba experiment")
+version = v"0.0.2"
+sid,trial_skip = @read_args("Runs an intermittent aba experiment, version $version.")
 
 const ms = 1/1000
 const st = 1/12
@@ -17,12 +18,12 @@ aba_SOA = 4tone_SOA
 A_freq = 300
 response_timeout = 750ms
 n_repeat_example = 20
-n_trials = 140
+n_trials = 135
 n_break_after = 15
-stimuli_per_response = 3
+stimuli_per_response = 2
 responses_per_phase = 7
 
-response_pause = aba_SOA - 3tone_SOA
+response_pause = 400ms
 
 function aba(step)
   A = ramp(tone(A_freq,tone_len))
@@ -33,8 +34,7 @@ end
 
 stimuli = Dict(:low => aba(3st),:medium => aba(6st),:high => aba(12st))
 
-# randomize presentations, but gaurantee that all stimuli are presented in equal
-# quantity within the first and second half of trials
+# randomize context order
 contexts = @> keys(stimuli) begin
   cycle
   take(n_trials)
@@ -142,7 +142,7 @@ function setup()
   end
 end
 
-exp = Experiment(setup,condition = "pilot",sid = sid,version = v"0.0.1",
+exp = Experiment(setup,condition = "pilot",sid = sid,version = version,
                  skip=trial_skip,columns = [:time,:stimulus,:phase])
 play(attenuate(ramp(tone(1000,1)),atten_dB))
 run(exp)
