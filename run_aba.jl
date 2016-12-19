@@ -16,7 +16,7 @@ tone_len = 50ms
 tone_SOA = 120ms
 aba_SOA = 4tone_SOA
 A_freq = 300
-response_timeout = 750ms
+response_spacing = 200ms
 n_repeat_example = 20
 n_trials = 135
 n_break_after = 15
@@ -46,32 +46,40 @@ isresponse(e) = iskeydown(e,key"p") || iskeydown(e,key"q")
 
 function create_aba(stimulus;info...)
   sound = stimuli[stimulus]
-  moment(aba_SOA) do t
+  moment() do t
     play(sound)
     record("stimulus",time=t,stimulus=stimulus;info...)    
-  end
+  end * moment(aba_SOA)
 end
 
 # runs an entire trial
-function create_trial(stimulus;limit=response_timeout,info...)
+function practice_trial(stimulus;limit=response_spacing,info...)
+  resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
+
   go_faster = render("Faster!",size=50,duration=500ms,y=0.15,priority=1)
-  await = timeout(isresponse,limit) do time
+  waitlen = aba_SOA*stimuli_per_response+limit
+  await = timeout(isresponse,waitlen,delta_update=false) do time
     record("response_timeout",time=time;info...)
     display(go_faster)
   end
 
+  x = [resp,show_cross(),
+       prod(repeated(create_aba(stimulus;info...),stimuli_per_response)),
+       await,moment(aba_SOA*stimuli_per_response+response_spacing)]
+  repeat(x,outer=responses_per_phase)
+end
+
+function real_trial(stimulus;limit=response_spacing,info...)
   resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
 
-  x = [resp,show_cross(response_pause),
-       repeated(create_aba(stimulus;info...),stimuli_per_response),await]
+  x = [resp,show_cross(),
+       prod(repeated(create_aba(stimulus;info...),stimuli_per_response)),
+       moment(aba_SOA*stimuli_per_response + limit)]
   repeat(x,outer=responses_per_phase)
 end
 
 function setup()
   start = moment(t -> record("start",time=t))
-
-  clear = render(colorant"gray")
-  blank = moment(t -> display(clear))
 
   addbreak(
     instruct("""
@@ -85,7 +93,7 @@ function setup()
       For instance, the following example will normally seem to be
       galloping."""))
 
-  addpractice(blank,show_cross(response_pause),
+  addpractice(show_cross(),
               repeated(create_aba(:low,phase="practice"),n_repeat_example),
               moment(aba_SOA))
 
@@ -94,7 +102,7 @@ function setup()
       On the other hand, normally the following example will eventually seem to
       be two separate series of tones."""))
   
-  addpractice(blank,show_cross(response_pause),
+  addpractice(show_cross(),
               repeated(create_aba(:high,phase="practice"),n_repeat_example),
               moment(aba_SOA))
 
@@ -107,12 +115,12 @@ function setup()
 
     instruct("""
 
-      After every $x sounds, we want you to indicate what you heard most often,
+      Every once in a while, we want you to indicate what you heard most often,
       a gallop or separate tones. Let's practice a bit.  Use "Q" to indicate
       that you heard a "gallop" most of the time, and "P" otherwise.  Respond as
       promptly as you can.""") )
 
-  addpractice(create_trial(:medium,phase="practice",limit=10response_timeout))
+  addpractice(practice_trial(:medium,phase="practice",limit=10response_spacing))
 
   addbreak(instruct("""
   
@@ -120,7 +128,7 @@ function setup()
     try another practice round, this time a little bit faster.
   """) )
 
-  addpractice(create_trial(:medium,phase="practice",limit=2response_timeout))
+  addpractice(practice_trial(:medium,phase="practice",limit=2response_spacing))
   
   addbreak(instruct("""
 
@@ -136,8 +144,8 @@ function setup()
   for trial in 1:n_trials
     addbreak_every(n_break_after,n_trials)
 
-    context_phase = create_trial(contexts[trial],phase="context")
-    test_phase = create_trial(:medium,phase="test")
+    context_phase = real_trial(contexts[trial],phase="context")
+    test_phase = real_trial(:medium,phase="test")
     addtrial(context_phase,test_phase)
   end
 end
