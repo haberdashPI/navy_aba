@@ -118,7 +118,7 @@ function setup()
       Every once in a while, we want you to indicate what you heard most often,
       a gallop or separate tones. Let's practice a bit.  Use "Q" to indicate
       that you heard a "gallop" most of the time, and "P" otherwise.  Respond as
-      promptly as you can.""") )
+      promptly as you can."""))
 
   addpractice(practice_trial(:medium,phase="practice",limit=10response_spacing))
 
@@ -132,10 +132,9 @@ function setup()
   
   addbreak(instruct("""
 
-    In the real experiment, your time to respond will be even more limited. 
-    Please try to respond before you see the "Faster!" flash, but even if
-    it does flash, please still respond.
-  """) )
+    In the real experiment, your time to respond will be even more limited.  Try
+    to respond before the next trial begins, but even if you don't please still
+    respond."""))
 
   str = render("Hit any key to start the real experiment...")
   anykey = moment(t -> display(str))
