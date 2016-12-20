@@ -1,9 +1,9 @@
 # About
 
-This is a work-in-progress expeirment looking at
+This is a work-in-progress experiment looking at
 [auditory streaming](http://www.nature.com/nrn/journal/v14/n10/fig_tab/nrn3565_F3.html)
-with intermittent presentations, to allow easier to interpret EEG data,
-motivated by the following research:
+with intermittent presentations, to allow for easier to interpret EEG data,
+motivated by the following work:
 
 Pitts, M. A., & Britz, J. (2011). Insights from Intermittent Binocular Rivalry and EEG. Frontiers in Human Neuroscience, 5. https://doi.org/10.3389/fnhum.2011.00107
 
