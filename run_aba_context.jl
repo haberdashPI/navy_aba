@@ -18,11 +18,10 @@ aba_SOA = 4tone_SOA
 A_freq = 300
 response_spacing = 200ms
 n_repeat_example = 20
-n_trials = 1600
-n_break_after = 50
+n_trials = 135
+n_break_after = 15
 stimuli_per_response = 2
-responses_per_phase = 1
-num_practice_trials = 10
+responses_per_phase = 7
 
 response_pause = 400ms
 
@@ -50,7 +49,7 @@ function create_aba(stimulus;info...)
   moment() do t
     play(sound)
     record("stimulus",time=t,stimulus=stimulus;info...)    
-  end
+  end * moment(aba_SOA)
 end
 
 # runs an entire trial
@@ -64,20 +63,17 @@ function practice_trial(stimulus;limit=response_spacing,info...)
     display(go_faster)
   end
 
-  stim = create_aba(stimulus;info...) * moment(aba_SOA)
-
   x = [resp,show_cross(),
-       prod(repeated(stim,stimuli_per_response)),
+       prod(repeated(create_aba(stimulus;info...),stimuli_per_response)),
        await,moment(aba_SOA*stimuli_per_response+response_spacing)]
   repeat(x,outer=responses_per_phase)
 end
 
 function real_trial(stimulus;limit=response_spacing,info...)
   resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
-  stim = create_aba(stimulus;info...) * moment(aba_SOA)
 
   x = [resp,show_cross(),
-       prod(repeated(stim,stimuli_per_response)),
+       prod(repeated(create_aba(stimulus;info...),stimuli_per_response)),
        moment(aba_SOA*stimuli_per_response + limit)]
   repeat(x,outer=responses_per_phase)
 end
@@ -98,8 +94,8 @@ function setup()
       galloping."""))
 
   addpractice(show_cross(),
-              repeated([create_aba(:low,phase="practice"),moment(aba_SOA)],
-                       n_repeat_example))
+              repeated(create_aba(:low,phase="practice"),n_repeat_example),
+              moment(aba_SOA))
 
   addbreak(instruct("""
 
@@ -107,8 +103,8 @@ function setup()
       be two separate series of tones."""))
   
   addpractice(show_cross(),
-              repeated([create_aba(:high,phase="practice"),moment(aba_SOA)],
-                       n_repeat_example))
+              repeated(create_aba(:high,phase="practice"),n_repeat_example),
+              moment(aba_SOA))
 
   x = stimuli_per_response
   addbreak(
@@ -124,9 +120,7 @@ function setup()
       that you heard a "gallop" most of the time, and "P" otherwise.  Respond as
       promptly as you can."""))
 
-  addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=10response_spacing),
-             num_practice_trials))
+  addpractice(practice_trial(:medium,phase="practice",limit=10response_spacing))
 
   addbreak(instruct("""
   
@@ -134,9 +128,7 @@ function setup()
     try another practice round, this time a little bit faster.
   """) )
 
-  addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=2response_spacing),
-             num_practice_trials))
+  addpractice(practice_trial(:medium,phase="practice",limit=2response_spacing))
   
   addbreak(instruct("""
 
@@ -150,7 +142,10 @@ function setup()
   
   for trial in 1:n_trials
     addbreak_every(n_break_after,n_trials)
-    addtrial(real_trial(:medium,phase="test"))
+
+    context_phase = real_trial(contexts[trial],phase="context")
+    test_phase = real_trial(:medium,phase="test")
+    addtrial(context_phase,test_phase)
   end
 end
 
