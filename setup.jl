@@ -1,3 +1,2 @@
-Pkg.clone("https://github.com/haberdashPI/Psychotask.jl")
-Pkg.build("Psychotask")
-Pkg.add("Lazy")
+Pkg.clone("https://github.com/haberdashPI/Weber.jl/")
+Pkg.build("Weber")
