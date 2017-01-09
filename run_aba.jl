@@ -2,13 +2,13 @@
 
 using Weber
 
-version = v"0.0.3"
+version = v"0.0.4"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
 const ms = 1/1000
 const st = 1/12
-atten_dB = 20
+atten_dB = 30
 
 # We might be able to change this to ISI now that there
 # is no gap.
@@ -18,10 +18,10 @@ aba_SOA = 4tone_SOA
 A_freq = 300
 response_spacing = aba_SOA
 n_trials = 1600
-n_break_after = 50
+n_break_after = 75
 stimuli_per_response = 2
 
-n_repeat_example = 20
+n_repeat_example = 30
 num_practice_trials = 20
 
 function aba(step)
@@ -31,7 +31,8 @@ function aba(step)
   sound([A;gap;B;gap;A])
 end
 
-stimuli = Dict(:low => aba(3st),:medium => aba(10st),:high => aba(30st))
+medium_st = 8st
+stimuli = Dict(:low => aba(3st),:medium => aba(medium_st),:high => aba(18st))
 
 isresponse(e) = iskeydown(e,key"p") || iskeydown(e,key"q")
 
@@ -71,6 +72,7 @@ function real_trial(stimulus;limit=response_spacing,info...)
 end
 
 exp = Experiment(sid = sid,condition = "pilot",version = version,
+				 separation = medium_st,
                  skip=trial_skip,columns = [:stimulus,:phase])
 
 setup(exp) do
