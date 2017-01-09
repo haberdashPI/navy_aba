@@ -1,10 +1,10 @@
 #!/usr/bin/env julia
 
-using Psychotask
-using Lazy: @>
+using Weber
 
-version = v"0.0.2"
-sid,trial_skip = @read_args("Runs an intermittent aba context experiment, version $version.")
+version = v"0.0.3"
+sid,trial_skip =
+  @read_args("Runs an intermittant aba experiment, version $version.")
 
 const ms = 1/1000
 const st = 1/12
@@ -12,44 +12,34 @@ atten_dB = 20
 
 # We might be able to change this to ISI now that there
 # is no gap.
-tone_len = 50ms
-tone_SOA = 120ms
+tone_len = 60ms
+tone_SOA = 144ms
 aba_SOA = 4tone_SOA
 A_freq = 300
-response_spacing = 200ms
-n_repeat_example = 20
+response_spacing = aba_SOA
 n_trials = 1600
 n_break_after = 50
 stimuli_per_response = 2
-responses_per_phase = 1
-num_practice_trials = 10
 
-response_pause = 400ms
+n_repeat_example = 20
+num_practice_trials = 20
 
 function aba(step)
   A = ramp(tone(A_freq,tone_len))
   B = ramp(tone(A_freq * 2^step,tone_len))
   gap = silence(tone_SOA-tone_len)
-  [A;gap;B;gap;A]
+  sound([A;gap;B;gap;A])
 end
 
-stimuli = Dict(:low => aba(3st),:medium => aba(6st),:high => aba(12st))
+stimuli = Dict(:low => aba(3st),:medium => aba(10st),:high => aba(30st))
 
-# randomize context order
-contexts = @> keys(stimuli) begin
-  cycle
-  take(n_trials)
-  collect
-  shuffle
-end
- 
 isresponse(e) = iskeydown(e,key"p") || iskeydown(e,key"q")
 
 function create_aba(stimulus;info...)
   sound = stimuli[stimulus]
   moment() do t
     play(sound)
-    record("stimulus",time=t,stimulus=stimulus;info...)    
+    record("stimulus",stimulus=stimulus;info...)
   end
 end
 
@@ -57,33 +47,34 @@ end
 function practice_trial(stimulus;limit=response_spacing,info...)
   resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
 
-  go_faster = render("Faster!",size=50,duration=500ms,y=0.15,priority=1)
+  go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
   waitlen = aba_SOA*stimuli_per_response+limit
   await = timeout(isresponse,waitlen,delta_update=false) do time
-    record("response_timeout",time=time;info...)
+    record("response_timeout";info...)
     display(go_faster)
   end
 
-  stim = create_aba(stimulus;info...) * moment(aba_SOA)
+  stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
-  x = [resp,show_cross(),
-       prod(repeated(stim,stimuli_per_response)),
-       await,moment(aba_SOA*stimuli_per_response+response_spacing)]
-  repeat(x,outer=responses_per_phase)
+  [resp,show_cross(),
+   moment(repeated(stim,stimuli_per_response)),
+   await,moment(aba_SOA*stimuli_per_response+response_spacing)]
 end
 
 function real_trial(stimulus;limit=response_spacing,info...)
   resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
-  stim = create_aba(stimulus;info...) * moment(aba_SOA)
+  stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
-  x = [resp,show_cross(),
-       prod(repeated(stim,stimuli_per_response)),
-       moment(aba_SOA*stimuli_per_response + limit)]
-  repeat(x,outer=responses_per_phase)
+  [resp,show_cross(),
+   moment(repeated(stim,stimuli_per_response)),
+   moment(aba_SOA*stimuli_per_response + limit)]
 end
 
-function setup()
-  start = moment(t -> record("start",time=t))
+exp = Experiment(sid = sid,condition = "pilot",version = version,
+                 skip=trial_skip,columns = [:stimulus,:phase])
+
+setup(exp) do
+  start = moment(t -> record("start"))
 
   addbreak(
     instruct("""
@@ -105,7 +96,7 @@ function setup()
 
       On the other hand, normally the following example will eventually seem to
       be two separate series of tones."""))
-  
+
   addpractice(show_cross(),
               repeated([create_aba(:high,phase="practice"),moment(aba_SOA)],
                        n_repeat_example))
@@ -129,7 +120,7 @@ function setup()
              num_practice_trials))
 
   addbreak(instruct("""
-  
+
     In the real experiment, your time to respond will be limited. Let's
     try another practice round, this time a little bit faster.
   """) )
@@ -137,24 +128,22 @@ function setup()
   addpractice(
     repeated(practice_trial(:medium,phase="practice",limit=2response_spacing),
              num_practice_trials))
-  
+
   addbreak(instruct("""
 
     In the real experiment, your time to respond will be even more limited.  Try
     to respond before the next trial begins, but even if you don't please still
     respond."""))
 
-  str = render("Hit any key to start the real experiment...")
+  str = visual("Hit any key to start the real experiment...")
   anykey = moment(t -> display(str))
   addbreak(anykey,await_response(iskeydown))
-  
+
   for trial in 1:n_trials
     addbreak_every(n_break_after,n_trials)
     addtrial(real_trial(:medium,phase="test"))
   end
 end
 
-exp = Experiment(setup,condition = "pilot",sid = sid,version = version,
-                 skip=trial_skip,columns = [:time,:stimulus,:phase])
 play(attenuate(ramp(tone(1000,1)),atten_dB))
 run(exp)
