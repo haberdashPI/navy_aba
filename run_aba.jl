@@ -147,5 +147,5 @@ setup(exp) do
   end
 end
 
-play(attenuate(ramp(tone(1000,1)),atten_dB))
+play(sound(attenuate(ramp(tone(1000,1)),atten_dB)))
 run(exp)
