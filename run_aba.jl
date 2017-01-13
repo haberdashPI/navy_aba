@@ -65,13 +65,12 @@ function real_trial(stimulus;limit=response_spacing,info...)
   resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
   stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
-  [resp,show_cross(),
-   moment(repeated(stim,stimuli_per_response)),
+  [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),
    moment(aba_SOA*stimuli_per_response + limit)]
 end
 
 exp = Experiment(sid = sid,condition = "pilot",version = version,
-				 separation = medium_st,
+				 separation = "8st",
                  skip=trial_skip,columns = [:stimulus,:phase])
 
 setup(exp) do
