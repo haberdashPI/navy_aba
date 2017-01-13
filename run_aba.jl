@@ -50,16 +50,15 @@ function practice_trial(stimulus;limit=response_spacing,info...)
 
   go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
   waitlen = aba_SOA*stimuli_per_response+limit
-  await = timeout(isresponse,waitlen,delta_update=false) do time
+  min_wait = aba_SOA*stimuli_per_response+response_spacing
+  await = timeout(isresponse,waitlen,atleast=min_wait) do time
     record("response_timeout";info...)
     display(go_faster)
   end
 
   stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
-  [resp,show_cross(),
-   moment(repeated(stim,stimuli_per_response)),
-   await,moment(aba_SOA*stimuli_per_response+response_spacing)]
+  [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),await]
 end
 
 function real_trial(stimulus;limit=response_spacing,info...)
@@ -147,5 +146,5 @@ setup(exp) do
   end
 end
 
-play(sound(attenuate(ramp(tone(1000,1)),atten_dB)))
+play(attenuate(ramp(tone(1000,1)),atten_dB))
 run(exp)
