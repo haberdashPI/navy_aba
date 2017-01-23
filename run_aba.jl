@@ -70,8 +70,9 @@ function real_trial(stimulus;limit=response_spacing,info...)
 end
 
 exp = Experiment(sid = sid,condition = "pilot",version = version,
-				 separation = "8st",
-                 skip=trial_skip,columns = [:stimulus,:phase])
+				         separation = "8st",skip=trial_skip,
+                 moment_resolution=moment_resolution,
+                 columns = [:stimulus,:phase])
 
 setup(exp) do
   start = moment(t -> record("start"))
