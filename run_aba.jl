@@ -17,8 +17,8 @@ tone_SOA = 144ms
 aba_SOA = 4tone_SOA
 A_freq = 300
 response_spacing = aba_SOA
-n_trials = 1600
-n_break_after = 75
+n_trials = 1360
+n_break_after = 85
 stimuli_per_response = 2
 
 n_repeat_example = 30
@@ -28,7 +28,7 @@ function aba(step)
   A = ramp(tone(A_freq,tone_len))
   B = ramp(tone(A_freq * 2^step,tone_len))
   gap = silence(tone_SOA-tone_len)
-  sound([A;gap;B;gap;A])
+  sound(attenuate([A;gap;B;gap;A],atten_dB))
 end
 
 medium_st = 8st
@@ -45,7 +45,7 @@ function create_aba(stimulus;info...)
 end
 
 # runs an entire trial
-function practice_trial(stimulus;limit=response_spacing,info...)
+ function practice_trial(stimulus;limit=response_spacing,info...)
   resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
 
   go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
