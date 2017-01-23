@@ -9,47 +9,34 @@ Pitts, M. A., & Britz, J. (2011). Insights from Intermittent Binocular Rivalry a
 
 # Installation
 
-1. [Download](https://github.com/haberdashPI/navy_aba/archive/master.zip)
+You need to install julia, and then run the setup.jl script.
+
+One way to do this is as follows:
+
+1. [Download](https://github.com/haberdashPI/navy_wordstream/archive/master.zip)
    and unzip this project.
-2. Install the 64-bit version of
-   [julia](https://en.wikibooks.org/wiki/Introducing_Julia/Getting_started)
-   (make sure julia is in your `PATH`)
-3. Run setup.jl
-
-This last step is accomplished by entering the following commands in a terminal.
-
-```console
-$ cd "[download-location]"
-$ julia setup.jl
-```
-
-Replace `[download-location]` with the directory where you unziped this project.
+2. Follow the directions to [install Juno](https://github.com/JunoLab/uber-juno/blob/master/setup.md)
+3. Open the setup.jl file for this project in Juno.
+4. Run setup.jl in Juno (e.g. Julia > Run File).
+5. call `using Weber` to verify the installation (you may need to restart Julia).
 
 # Running
 
-To run the experiment just call julia from the terminal as follows:
+If you installed Juno (see above) just run `run_aba.jl` in Juno.  Make
+sure you have the console open (Julia > Open Console), as you will be prompted
+to enter a number of experimental parameters. Also note that important warnings
+and information about the experiment will be written to the console.
 
-```console
-$ cd "[download-location]"
-$ julia run_aba.jl [sid]
-```
-
-Replace `[sid]` with a subject id number. Results will be saved in a `data` subdirectory.
+Alternatively, if you have julia setup in your `PATH`, you can run the
+experiment from a terminal by typing `julia run_aba.jl`. On mac (or unix)
+this can be shortened to `./run_aba.jl`. You can get help about how to
+use the console verison by typing `julia run_aba.jl -h` (or `./run_aba.jl` on
+mac or unix).
 
 ## Restarting the experiment
 
 If the experiment gets interrupted, the program will report an offset
 number. This number is also saved on each line of the data recorded during
-the experiment. You can use this number as a second argument to run_aba.jl,
-and the experiment will start at the beginning of the trial it was interrupted
-on.
-
-In the below example, the experiment was terminated for participant 1234 at
-offset 20, and the experiment is then resumed with the second command.
-
-```console
-$ julia run_aba.jl 1234
-INFO: Experiment terminated at offset 20.
-$ julia run_aba.jl 1234 20
-```
+the experiment. You can use this number to call `run_aba.jl` starting from
+somewhere in the middle of the experiment.
 
