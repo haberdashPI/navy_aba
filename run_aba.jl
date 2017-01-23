@@ -3,7 +3,7 @@
 using Weber
 include("calibrate.jl")
 
-version = v"0.0.4"
+version = v"0.0.5"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
