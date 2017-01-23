@@ -1,6 +1,7 @@
 #!/usr/bin/env julia
 
 using Weber
+include("calibrate.jl")
 
 version = v"0.0.4"
 sid,trial_skip =
@@ -8,7 +9,6 @@ sid,trial_skip =
 
 const ms = 1/1000
 const st = 1/12
-atten_dB = 30
 
 # We might be able to change this to ISI now that there
 # is no gap.
