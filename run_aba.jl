@@ -2,6 +2,7 @@
 
 using Weber
 include("calibrate.jl")
+setup_sound(buffer_size=buffer_size)
 
 version = v"0.0.5"
 sid,trial_skip =
