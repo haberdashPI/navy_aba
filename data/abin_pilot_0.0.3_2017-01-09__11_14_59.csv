@@ -1,0 +1,5 @@
+psych_version,start_date,start_time,offset,trial,time,sid,condition,version,code,stimulus,phase
+0.2.1,2017-01-09,11:14:59,1,0,5.813601970672607,abin,pilot,0.0.3,instructions,,
+0.2.1,2017-01-09,11:14:59,1,0,5.813601970672607,abin,pilot,0.0.3,bad_delta_latency(5.681708955764771),,
+0.2.1,2017-01-09,11:14:59,1,0,5.813601970672607,abin,pilot,0.0.3,paused,,
+0.2.1,2017-01-09,11:14:59,1,0,5.813601970672607,abin,pilot,0.0.3,terminated,,
