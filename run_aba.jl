@@ -33,6 +33,7 @@ function aba(step)
 end
 
 medium_st = 8st
+medium_str = "8st"
 stimuli = Dict(:low => aba(3st),:medium => aba(medium_st),:high => aba(18st))
 
 isresponse(e) = iskeydown(e,key"p") || iskeydown(e,key"q")
@@ -71,7 +72,7 @@ function real_trial(stimulus;limit=response_spacing,info...)
 end
 
 exp = Experiment(sid = sid,condition = "pilot",version = version,
-				         separation = "8st",skip=trial_skip,
+				         separation = medium_str,skip=trial_skip,
                  moment_resolution=moment_resolution,
                  columns = [:stimulus,:phase])
 
