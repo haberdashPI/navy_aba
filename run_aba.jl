@@ -13,10 +13,10 @@ const st = 1/12
 
 # We might be able to change this to ISI now that there
 # is no gap.
-tone_len = 60ms
-tone_SOA = 144ms
+tone_len = 75ms
+tone_SOA = 200ms
 aba_SOA = 4tone_SOA
-A_freq = 300
+A_freq = 400
 response_spacing = aba_SOA
 n_trials = 1360
 n_break_after = 85
@@ -32,11 +32,13 @@ function aba(step)
   sound(attenuate([A;gap;B;gap;A],atten_dB))
 end
 
-medium_st = 8st
-medium_str = "8st"
+medium_st = 6st
+medium_str = "6st"
 stimuli = Dict(:low => aba(3st),:medium => aba(medium_st),:high => aba(18st))
-
-isresponse(e) = iskeydown(e,key"p") || iskeydown(e,key"q")
+key_enter = Weber.KeyboardKey(13)
+isresponse(e) = iskeydown(e,key"p") ||
+                iskeydown(e,key"q") ||
+                iskeydown(e,key_enter)
 
 function create_aba(stimulus;info...)
   sound = stimuli[stimulus]
@@ -48,7 +50,9 @@ end
 
 # runs an entire trial
  function practice_trial(stimulus;limit=response_spacing,info...)
-  resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
+   resp = response(key"q" => "stream_1",
+                   key"p" => "stream_2",
+                   key_enter => "unsure";info...)
 
   go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
   waitlen = aba_SOA*stimuli_per_response+limit
@@ -64,7 +68,9 @@ end
 end
 
 function real_trial(stimulus;limit=response_spacing,info...)
-  resp = response(key"q" => "stream_1",key"p" => "stream_2";info...)
+  resp = response(key"q" => "stream_1",
+                  key"p" => "stream_2",
+                  key_enter => "unsure";info...)
   stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
   [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),
@@ -115,8 +121,8 @@ setup(exp) do
 
       Every once in a while, we want you to indicate what you heard most often,
       a gallop or separate tones. Let's practice a bit.  Use "Q" to indicate
-      that you heard a "gallop" most of the time, and "P" otherwise.  Respond as
-      promptly as you can."""))
+      that you heard a "gallop" most of the time, and "P" otherwise.
+      If you're unsure press "Enter"  Respond as promptly as you can."""))
 
   addpractice(
     repeated(practice_trial(:medium,phase="practice",limit=10response_spacing),
