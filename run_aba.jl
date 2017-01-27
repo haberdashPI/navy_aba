@@ -29,7 +29,7 @@ function aba(step)
   A = ramp(tone(A_freq,tone_len))
   B = ramp(tone(A_freq * 2^step,tone_len))
   gap = silence(tone_SOA-tone_len)
-  sound(attenuate([A;gap;B;gap;A],atten_dB))
+  attenuate([A;gap;B;gap;A],atten_dB)
 end
 
 medium_st = 6st
@@ -41,25 +41,23 @@ isresponse(e) = iskeydown(e,key"p") ||
                 iskeydown(e,key_enter)
 
 function create_aba(stimulus;info...)
-  sound = stimuli[stimulus]
-  moment() do t
-    play(sound)
-    record("stimulus",stimulus=stimulus;info...)
-  end
+  [moment(play,stimuli[stimulus]),
+   moment(record,"stimulus",stimulus=stimulus;info...)]
 end
 
 # runs an entire trial
- function practice_trial(stimulus;limit=response_spacing,info...)
+function practice_trial(stimulus;limit=response_spacing,info...)
    resp = response(key"q" => "stream_1",
                    key"p" => "stream_2",
                    key_enter => "unsure";info...)
 
-  go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
   waitlen = aba_SOA*stimuli_per_response+limit
   min_wait = aba_SOA*stimuli_per_response+response_spacing
-  await = timeout(isresponse,waitlen,atleast=min_wait) do time
-    record("response_timeout";info...)
+
+  go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
+  await = timeout(isresponse,waitlen,atleast=min_wait) do
     display(go_faster)
+    record("response_timeout";info...)
   end
 
   stim = [create_aba(stimulus;info...),moment(aba_SOA)]
@@ -83,7 +81,7 @@ exp = Experiment(sid = sid,condition = "pilot",version = version,
                  columns = [:stimulus,:phase])
 
 setup(exp) do
-  start = moment(t -> record("start"))
+  start = moment(record,"start")
 
   addbreak(
     instruct("""
@@ -144,8 +142,7 @@ setup(exp) do
     to respond before the next trial begins, but even if you don't please still
     respond."""))
 
-  str = visual("Hit any key to start the real experiment...")
-  anykey = moment(t -> display(str))
+  anykey = moment(display,"Hit any key to start the real experiment...")
   addbreak(anykey,await_response(iskeydown))
 
   for trial in 1:n_trials
