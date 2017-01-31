@@ -4,7 +4,7 @@ using Weber
 include("calibrate.jl")
 setup_sound(buffer_size=buffer_size)
 
-version = v"0.0.6"
+version = v"0.0.8"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
