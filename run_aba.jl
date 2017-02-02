@@ -4,7 +4,7 @@ using Weber
 include("calibrate.jl")
 setup_sound(buffer_size=buffer_size)
 
-version = v"0.0.6"
+version = v"0.0.8"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
@@ -13,14 +13,14 @@ const st = 1/12
 
 # We might be able to change this to ISI now that there
 # is no gap.
-tone_len = 75ms
-tone_SOA = 200ms
+tone_len = 73ms
+tone_SOA = 175ms
 aba_SOA = 4tone_SOA
 A_freq = 400
 response_spacing = aba_SOA
 n_trials = 1360
 n_break_after = 85
-stimuli_per_response = 2
+stimuli_per_response = 3
 
 n_repeat_example = 30
 num_practice_trials = 20

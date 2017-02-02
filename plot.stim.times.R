@@ -45,6 +45,8 @@ int_trials = results %>%
     filter(trial >= 1,version == '0.0.6') %>%
     group_by(sid,trial) %>%
     do(trial_row(.))
+
+write.csv(int_trials,'rts.csv')
     
 int_times = int_trials %>%
     group_by(sid) %>%
@@ -71,19 +73,30 @@ find_cont_times = function(data){
     result
 }
 
-cont_times = results %>%
-    filter(trial >= 1,version == '0.0.7') %>%
+cont_resps = results %>%
+    filter(trial >= 1,version == '0.0.7')
+write.csv(cont_resps,'rts2.csv')
+
+cont_times = cont_resps
     group_by(sid) %>%
     do(find_cont_times(.))
     #filter(trial_length < 3)
 
 cont_times$type = 'continuous'
 int_times$type = 'intermittant'
+width = quantile(int_trials$trial_length,0.95)
+
+a = round(cont_times$length / width)
+b = round(int_times$length / width)
+ks.test(a,b)
+
 times = rbind(cont_times,int_times)
 
-width = quantile(int_trials$trial_length,0.95)
+
+
 ggplot(times,aes(x=length)) + geom_histogram(binwidth=width) + facet_grid(type~.)
-ggplot(times,aes(x=length)) + geom_histogram(binwidth=width) + facet_grid(code~type)
 ggsave("abin_percept_lengths.pdf")
+ggplot(times,aes(x=length)) + geom_histogram(binwidth=width) + facet_grid(code~type)
+ggsave("abin_percept_lengths_by_code.pdf")
 
 ks.test(cont_times$length,int_times$length)
