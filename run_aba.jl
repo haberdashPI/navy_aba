@@ -4,9 +4,10 @@ using Weber
 include("calibrate.jl")
 setup_sound(buffer_size=buffer_size)
 
-version = v"0.0.8"
-sid,trial_skip =
-  @read_args("Runs an intermittant aba experiment, version $version.")
+version = v"0.0.9"
+sid,trial_skip,presentation =
+  @read_args("Runs an intermittant or continuous aba experiment, version $version.",
+             presentation = [:cont,:int])
 
 const ms = 1/1000
 const st = 1/12
@@ -17,13 +18,22 @@ tone_len = 73ms
 tone_SOA = 175ms
 aba_SOA = 4tone_SOA
 A_freq = 400
-response_spacing = aba_SOA
-n_trials = 1360
-n_break_after = 85
-stimuli_per_response = 3
+
+if presentation == :int
+  n_trials = 1360
+  n_break_after = 85
+  stimuli_per_response = 3
+  num_practice_trials = 20
+  trial_spacing = aba_SOA
+elseif presentation == :cont
+  n_trials = 34
+  n_break_after = 2
+  stimuli_per_response = 120
+  num_practice_trials = 1
+  trial_spacing = 3
+end
 
 n_repeat_example = 30
-num_practice_trials = 20
 
 function aba(step)
   A = ramp(tone(A_freq,tone_len))
@@ -35,10 +45,10 @@ end
 medium_st = 6st
 medium_str = "6st"
 stimuli = Dict(:low => aba(3st),:medium => aba(medium_st),:high => aba(18st))
-key_enter = Weber.KeyboardKey(13)
+
 isresponse(e) = iskeydown(e,key"p") ||
                 iskeydown(e,key"q") ||
-                iskeydown(e,key_enter)
+                iskeydown(e,key":enter:")
 
 function create_aba(stimulus;info...)
   [moment(play,stimuli[stimulus]),
@@ -46,13 +56,13 @@ function create_aba(stimulus;info...)
 end
 
 # runs an entire trial
-function practice_trial(stimulus;limit=response_spacing,info...)
+function practice_trial(stimulus;limit=trial_spacing,info...)
    resp = response(key"q" => "stream_1",
                    key"p" => "stream_2",
-                   key_enter => "unsure";info...)
+                   key":enter:" => "unsure";info...)
 
   waitlen = aba_SOA*stimuli_per_response+limit
-  min_wait = aba_SOA*stimuli_per_response+response_spacing
+  min_wait = aba_SOA*stimuli_per_response+trial_spacing
 
   go_faster = visual("Faster!",size=50,duration=500ms,y=0.15,priority=1)
   await = timeout(isresponse,waitlen,atleast=min_wait) do
@@ -65,18 +75,20 @@ function practice_trial(stimulus;limit=response_spacing,info...)
   [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),await]
 end
 
-function real_trial(stimulus;limit=response_spacing,info...)
+function real_trial(stimulus;limit=trial_spacing,info...)
   resp = response(key"q" => "stream_1",
                   key"p" => "stream_2",
-                  key_enter => "unsure";info...)
+                  key":enter:" => "unsure";info...)
   stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
   [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),
-   moment(aba_SOA*stimuli_per_response + limit)]
+   moment(aba_SOA*stimuli_per_response,display,colorant"gray"),
+   moment(limit)]
 end
 
 exp = Experiment(sid = sid,condition = "pilot",version = version,
-				         separation = medium_str,skip=trial_skip,
+                 presentation = string(presentation),
+				 separation = medium_str,skip=trial_skip,
                  moment_resolution=moment_resolution,
                  columns = [:stimulus,:phase])
 
@@ -108,39 +120,49 @@ setup(exp) do
               repeated([create_aba(:high,phase="practice"),moment(aba_SOA)],
                        n_repeat_example))
 
-  x = stimuli_per_response
-  addbreak(
-    instruct("""
+  if presentation == :int
+    addbreak(
+      instruct("""
 
-      In this experiment we'll be asking you to listen for whether it appears
-      that the tones "gallop", or are separate from one antoher."""),
+        In this experiment we'll be asking you to listen for whether it appears
+        that the tones "gallop", or are separate from one antoher."""),
 
-    instruct("""
+      instruct("""
 
-      Every once in a while, we want you to indicate what you heard most often,
-      a gallop or separate tones. Let's practice a bit.  Use "Q" to indicate
-      that you heard a "gallop" most of the time, and "P" otherwise.
-      If you're unsure press "Enter"  Respond as promptly as you can."""))
+        Every once in a while, we want you to indicate what you heard most often,
+        a gallop or separate tones. Let's practice a bit.  Use "Q" to indicate
+        that you heard a "gallop" most of the time, and "P" otherwise.
+        If you're unsure press "Enter"  Respond as promptly as you can."""))
 
-  addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=10response_spacing),
-             num_practice_trials))
+    addpractice(
+      repeated(practice_trial(:medium,phase="practice",limit=10trial_spacing),
+               num_practice_trials))
 
-  addbreak(instruct("""
+    addbreak(instruct("""
 
-    In the real experiment, your time to respond will be limited. Let's
-    try another practice round, this time a little bit faster.
-  """) )
+      In the real experiment, your time to respond will be limited. Let's
+      try another practice round, this time a little bit faster.
+    """) )
 
-  addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=2response_spacing),
-             num_practice_trials))
+    addpractice(
+      repeated(practice_trial(:medium,phase="practice",limit=2trial_spacing),
+               num_practice_trials))
 
-  addbreak(instruct("""
+    addbreak(instruct("""
 
-    In the real experiment, your time to respond will be even more limited.  Try
-    to respond before the next trial begins, but even if you don't please still
-    respond."""))
+      In the real experiment, your time to respond will be even more limited.  Try
+      to respond before the next trial begins, but even if you don't please still
+      respond."""))
+  elseif presentation == :cont
+    addbreak(
+      instruct("""
+
+        In this experiment we'll be asking you to listen for whether it appears
+        that the tones "gallop", or are separate from one antoher."""),
+      instruct("""
+        TODO!!!!"""))
+    addpractice(real_trial(:medium,phase="practice"))
+  end
 
   anykey = moment(display,"Hit any key to start the real experiment...")
   addbreak(anykey,await_response(iskeydown))
