@@ -1,12 +1,19 @@
-Pkg.add("Weber",v"0.3.0")
+Pkg.add("Weber",v"0.3.1")
+Pkg.add("SerialPorts")
 open("calibrate.jl","w") do s
-  println(s,"# call run_calibrate() to select an appropriate attenuation.")
-  println(s,"const atten_dB = 30")
-  println(s,"")
-  println(s,"# call Pkg.test(\"Weber\"). If the timing test fails, increase ")
-  println(s,"# moment resolution to avoid warnings.")
-  println(s,"const moment_resolution = Weber.default_moment_resolution")
-  println(s,"")
-  println(s,"# increase buffer size if you are hearing audible glitches in the sound.")
-  println(s,"const buffer_size = 256")
+  print(s,"""
+  # call run_calibrate() to select an appropriate attenuation.
+  const atten_dB = 30
+  
+  # call Pkg.test(\"Weber\"). If the timing test fails, increase 
+  # moment resolution to avoid warnings.
+  const moment_resolution = Weber.default_moment_resolution
+  
+  # increase buffer size if you are hearing audible glitches in the sound.
+  const buffer_size = 256
+
+  # select an appropriate serial port for stimtrak using
+  # SerailPorts.list_serialports() (after calling using SerialPorts)
+  const stimtrak_port = nothing
+  """)
 end
