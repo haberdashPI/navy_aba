@@ -13,7 +13,7 @@ open("calibrate.jl","w") do s
   const buffer_size = 256
 
   # select an appropriate serial port for stimtrak using
-  # SerailPorts.list_serialports() (after calling using SerialPorts)
+  # SerailPorts.list_serialports() (after calling `using SerialPorts`)
   const stimtrak_port = nothing
   """)
 end
