@@ -1,4 +1,4 @@
-Pkg.add("Weber",v"0.3.1")
+Pkg.add("Weber",v"0.3.2")
 Pkg.add("SerialPorts")
 open("calibrate.jl","w") do s
   print(s,"""
