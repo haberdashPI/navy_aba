@@ -17,8 +17,8 @@ end
 
 function stimtrak(code;kwds...)
   x = stimcode(code)
-  write(stimtraks,stimcode(code))
-  push!(kwds,:stimtrak => stimcode(code))
+  write(stimtraks,x)
+  push!(kwds,:stimtrak => x)
 end
 
 
