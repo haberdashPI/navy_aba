@@ -1,3 +1,4 @@
+
 using PyCall
 
 stop_code = 0xfd
@@ -19,7 +20,7 @@ DAQcode = begin
       while N in reserved
         N += 1
       end
-      
+
       if N > 0xff
         error("The code \"$str\" is the 257th code, but only 256 are allowed.")
       end
@@ -31,15 +32,24 @@ end
 
 # DAQwrite sends a code to the NI-DAQ interface
 # (connected to biosemi to code stimtrak events)
-DAQwrite = if DAQ_port != nothing
-  const pyDAQmx = pyimport_conda("pyDAQmx","pyDAQmx","fallen")
+const missing_library_error = "Location of niDAQmx library and include file unknown"
+DAQwrite = if stimtrak_port != nothing
+  try
+    const pyDAQmx = pyimport_conda("PyDAQmx","PyDAQmx","haberdashPI")
+  catch e
+
+    if isa(e,PyCall.PyError) && startswith(String(e.val["message"]),missing_library_error)
+      error("Could not find NI-DAQ library. Make sure it is installed.")
+    else rethrow(e)
+    end
+  end
   const DAQ_task = pyDAQmx[:Task]()
   DAQ_task[:StartTask]()
-  DAQ_task[:CreateDOChan](DAQ_port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
+  DAQ_task[:CreateDOChan](stimtrak_port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
   atexit(() -> DAQ_task[:StopTask]())
-  
+
   const bitarray = BitArray(8)
-  
+
   function fn(str)
     code = DAQcode(str)
     bitarray.chunks = [code]
@@ -55,5 +65,3 @@ end
 function stimtrak(code;kwds...)
   push!(kwds,:stimtrak => DAQwrite(code))
 end
-
-
