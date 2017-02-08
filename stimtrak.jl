@@ -1,24 +1,59 @@
-using SerialPorts
+using PyCall
 
-const stimtraks = (stimtrak_port != nothing ? SerialPort(stimtrak_port) : DevNull)
-const stimcodes = Dict{String,UInt8}()
-stimcode = begin
-  let N = 0
-    str -> get!(stimcodes,str) do
-      if N <= 0xff
+stop_code = 0xfd
+start_code = 0xfc
+manual_start_stop = 0x29
+
+# define any codes you what set to a particular value here
+const DAQcodes = Dict(
+  "pause" => stop_code,
+  "unpaused" => start_code,
+  "terminated" => stop_code
+)
+
+# any other codes are automatically selected by calling `DAQcode(code)`
+DAQcode = begin
+  let N = -1, reserved = values(DAQcodes)
+    str -> get!(DAQcodes,str) do
+      N += 1
+      while N in reserved
         N += 1
-        UInt8(N-1)
-      else
+      end
+      
+      if N > 0xff
         error("The code \"$str\" is the 257th code, but only 256 are allowed.")
       end
+
+      return UInt8(N)
     end
   end
 end
 
+# DAQwrite sends a code to the NI-DAQ interface
+# (connected to biosemi to code stimtrak events)
+DAQwrite = if DAQ_port != nothing
+  const pyDAQmx = pyimport_conda("pyDAQmx","pyDAQmx","fallen")
+  const DAQ_task = pyDAQmx[:Task]()
+  DAQ_task[:StartTask]()
+  DAQ_task[:CreateDOChan](DAQ_port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
+  atexit(() -> DAQ_task[:StopTask]())
+  
+  const bitarray = BitArray(8)
+  
+  function fn(str)
+    code = DAQcode(str)
+    bitarray.chunks = [code]
+    DAQ_task[:WriteDigitalLines](1,1,10.0,pyDAQmx[:DAQmx_Val_GroupByChannel],
+                                 convert(Array{Bool},bitarray),
+                                 nothing,nothing)
+    Int(code)
+  end
+else
+  code -> -1
+end
+
 function stimtrak(code;kwds...)
-  x = stimcode(code)
-  write(stimtraks,x)
-  push!(kwds,:stimtrak => x)
+  push!(kwds,:stimtrak => DAQwrite(code))
 end
 
 
