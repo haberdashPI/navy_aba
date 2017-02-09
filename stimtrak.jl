@@ -33,30 +33,48 @@ end
 # DAQwrite sends a code to the NI-DAQ interface
 # (connected to biosemi to code stimtrak events)
 const missing_library_error = "Location of niDAQmx library and include file unknown"
+function nidaq_missing(e::PyCall.PyError)
+  :message in keys(e.val) && startswith(String(e.val[:message]),missing_library_error)
+end
+nidaq_missing(e) = false
+
+isdaq_error(e::PyCall.PyError) = e.T == pyDAQmx[:DAQmxFunctions][:DAQError]
+isdaq_error(e) = false
+daq_message(e::PyCall.PyError) = e.val[:mess]
+
 DAQwrite = if stimtrak_port != nothing
   try
-    const pyDAQmx = pyimport_conda("PyDAQmx","PyDAQmx","haberdashPI")
+    global const pyDAQmx = pyimport_conda("PyDAQmx","PyDAQmx","haberdashPI")
+    global const np = pyimport("numpy")
   catch e
-
-    if isa(e,PyCall.PyError) && startswith(String(e.val["message"]),missing_library_error)
+    if nidaq_missing(e)
       error("Could not find NI-DAQ library. Make sure it is installed.")
     else rethrow(e)
     end
   end
-  const DAQ_task = pyDAQmx[:Task]()
-  DAQ_task[:StartTask]()
-  DAQ_task[:CreateDOChan](stimtrak_port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
-  atexit(() -> DAQ_task[:StopTask]())
 
-  const bitarray = BitArray(8)
+  try 
+    const DAQ_task = pyDAQmx[:Task]()
+    DAQ_task[:CreateDOChan](stimtrak_port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
+    DAQ_task[:StartTask]()
+    atexit(() -> DAQ_task[:StopTask]())
 
-  function fn(str)
-    code = DAQcode(str)
-    bitarray.chunks = [code]
-    DAQ_task[:WriteDigitalLines](1,1,10.0,pyDAQmx[:DAQmx_Val_GroupByChannel],
-                                 convert(Array{Bool},bitarray),
-                                 nothing,nothing)
-    Int(code)
+    const bitarray = BitArray(8)
+    const pyarray = pycall(np[:zeros],PyArray,8,dtype="uint8")
+    function fn(str)
+      bitarray.chunks[1] = DAQcode(str)
+      pyarray[:] = bitarray
+      DAQ_task[:WriteDigitalLines](1,1,10.0,pyDAQmx[:DAQmx_Val_GroupByChannel],
+                                   pyarray,nothing,nothing)
+      reinterpret(Int,bitarray.chunks[1])
+    end
+  catch e
+    if isdaq_error(e)
+	error("NI-DAQ Serial port error: "*daq_message(e)*
+		 "\n Python Stacktrace:\n"*string(e))
+    else
+	rethrow(e)
+    end
   end
 else
   code -> -1
