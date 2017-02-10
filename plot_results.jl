@@ -1,9 +1,9 @@
 using DataFrames
 using Lazy
 using Gadfly
-using DataFramesMeta
+# using DataFramesMeta
 using Colors
-# using Query
+using Query
 
 # file_pat = r"[0-9]+_pilot_0.0.5_8st_2017.*\.csv"
 # results = @>> readdir("data") begin
