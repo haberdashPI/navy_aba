@@ -8,7 +8,8 @@ export daq_extension
 type DAQmx <: Weber.Extension
   port::String
   codes::Dict{String,Int}
-  reserved::Array{String}
+  reserved::Array{Int}
+  wait_len::Float64
   N::Int
   bitarray::BitArray
   pyarray::PyArray
@@ -28,15 +29,17 @@ isdaq_error(e::PyCall.PyError) = e.T == pyDAQmx[:DAQmxFunctions][:DAQError]
 isdaq_error(e) = false
 daq_message(e::PyCall.PyError) = e.val[:mess]
 
-daq_extension(::Void;codes=nothing) = EmptyDAQmx()
-function daq_extension(port::String;codes=Dict{String,Int}())
-  pyDAQmx = PyObject(nothing)
-  np = PyObject(nothing)
+daq_extension(::Void;codes=nothing,eeg_sample_rate=nothing) = EmptyDAQmx()
+function daq_extension(port::String;codes=Dict{String,Int}(),
+                       eeg_sample_rate=nothing)
+  # code clearing waits just a little longer than one eeg sample
+  wait_len = 1.25/eeg_sample_rate
 
+  # load pyDAQmx library
   try
-    pyDAQmx = pyimport_conda("PyDAQmx","PyDAQmx","haberdashPI")
+    global const pyDAQmx = pyimport_conda("PyDAQmx","PyDAQmx","haberdashPI")
     global const group_by_channel = pyDAQmx[:DAQmx_Val_GroupByChannel]
-    np = pyimport("numpy")
+    global const np = pyimport("numpy")
   catch e
     if nidaq_missing(e)
       error("Could not find NI-DAQ library. Make sure it is installed.")
@@ -44,22 +47,25 @@ function daq_extension(port::String;codes=Dict{String,Int}())
     end
   end
 
+  # setup the task
+  task = PyObject(nothing)
   try
     task = pyDAQmx[:Task]()
     task[:CreateDOChan](port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
     task[:StartTask]()
     atexit(() -> task[:StopTask]())
-
-    bitarray = BitArray(8)
-    pyarray = pycall(np[:zeros],PyArray,8,dtype="uint8")
-
-    DAQmx(port,codes,keys(codes) |> collect,0,bitarray,pyarray,task)
   catch e
     if isdaq_error(e)
 	  error("NI-DAQ Serial port error: "*daq_message(e)*
 		    "\n Python Stacktrace:\n"*string(e))
     else rethrow(e) end
   end
+
+  bitarray = BitArray(8)
+  pyarray = pycall(np[:zeros],PyArray,8,dtype="uint8")
+  reserved = values(codes) |> collect
+  push!(reserved,0x00) # 0 is used to clear the line
+  DAQmx(port,codes,reserved,wait_len,0,bitarray,pyarray,task)
 end
 
 
@@ -72,7 +78,7 @@ function daq_code(daq::DAQmx,str::String)
     end
 
     if daq.N > 0xff
-      error("The code \"$str\" is the 257th code, but only 256 are allowed.")
+      error("The code \"$str\" is the 256th code, but only 255 are allowed.")
     end
 
     return UInt8(daq.N)
@@ -87,6 +93,11 @@ function daq_write(daq::DAQmx,str::String)
     daq.pyarray[:] = daq.bitarray
     daq.task[:WriteDigitalLines](1,1,10.0,group_by_channel,
                                  daq.pyarray,nothing,nothing)
+    daq.pyarray[:] = 0
+    sleep(daq.wait_len)
+    daq.task[:WriteDigitalLines](1,1,10.0,group_by_channel,
+                                 daq.pyarray,nothing,nothing)
+    sleep(daq.wait_len)
     reinterpret(Int,daq.bitarray.chunks[1])
   catch e
     if isdaq_error(e)
