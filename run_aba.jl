@@ -5,7 +5,7 @@ include("calibrate.jl")
 include("stimtrak.jl")
 setup_sound(buffer_size=buffer_size)
 
-version = v"0.1.0"
+version = v"0.1.1"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
@@ -92,7 +92,7 @@ exp = Experiment(
     :separation => medium_str,
     :stimulus,:phase,:stimtrak
   ],
-  skip=trial_skip, 
+  skip=trial_skip,
   extensions=[stimtrak(stimtrak_port)],
   moment_resolution=moment_resolution,
 )
@@ -173,7 +173,7 @@ setup(exp) do
     You may have noticed that, on occasion, within a single trial,
     the sound switches between gallping and not galloping multiple times.
   """),
-  instruct("""         
+  instruct("""
     In the following trials hit "Q" if you hear one or no such switches. Hit "P"
     if you hear more than one switch between galloping and not-galloping in a
     single trial.
