@@ -85,15 +85,16 @@ end
 
 
 exp = Experiment(
-  sid = sid,
-  condition = "pilot",
-  version = version,
-  separation = medium_str,
-  skip=trial_skip,
- 
-  record_callback=stimtrak,
+  columns = [
+    :sid => sid,
+    :condition => "pilot",
+    :version => version,
+    :separation => medium_str,
+    :stimulus,:phase,:stimtrak
+  ],
+  skip=trial_skip, 
+  extensions=[stimtrak(stimtrak_port)],
   moment_resolution=moment_resolution,
-  columns = [:stimulus,:phase,:stimtrak]
 )
 
 setup(exp) do
