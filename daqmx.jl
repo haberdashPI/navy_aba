@@ -1,7 +1,7 @@
 module WeberDAQmx
 using Weber
 using PyCall
-import Weber: record
+import Weber: record, setup
 
 export daq_extension
 
@@ -34,7 +34,8 @@ function daq_extension(port::String;codes=Dict{String,Int}())
   np = PyObject(nothing)
 
   try
-    pyDAQmx = pyimport("PyDAQmx","PyDAQmx","haberdashPI")
+    pyDAQmx = pyimport_conda("PyDAQmx","PyDAQmx","haberdashPI")
+    global const group_by_channel = pyDAQmx[:DAQmx_Val_GroupByChannel]
     np = pyimport("numpy")
   catch e
     if nidaq_missing(e)
@@ -43,7 +44,7 @@ function daq_extension(port::String;codes=Dict{String,Int}())
     end
   end
 
-  try 
+  try
     task = pyDAQmx[:Task]()
     task[:CreateDOChan](port,"",pyDAQmx[:DAQmx_Val_ChanForAllLines])
     task[:StartTask]()
@@ -51,8 +52,8 @@ function daq_extension(port::String;codes=Dict{String,Int}())
 
     bitarray = BitArray(8)
     pyarray = pycall(np[:zeros],PyArray,8,dtype="uint8")
-    
-    DAQmx(port,codes,keys(codes),bitarray,pyarray,0)
+
+    DAQmx(port,codes,keys(codes) |> collect,0,bitarray,pyarray,task)
   catch e
     if isdaq_error(e)
 	  error("NI-DAQ Serial port error: "*daq_message(e)*
@@ -60,8 +61,8 @@ function daq_extension(port::String;codes=Dict{String,Int}())
     else rethrow(e) end
   end
 end
-  
-  
+
+
 # any other codes are automatically selected by calling `DAQcode(code)`
 function daq_code(daq::DAQmx,str::String)
   get!(daq.codes,str) do
@@ -73,7 +74,7 @@ function daq_code(daq::DAQmx,str::String)
     if daq.N > 0xff
       error("The code \"$str\" is the 257th code, but only 256 are allowed.")
     end
-    
+
     return UInt8(daq.N)
   end
 end
@@ -81,10 +82,10 @@ end
 # DAQwrite sends a code to the NI-DAQ interface
 
 function daq_write(daq::DAQmx,str::String)
-  try 
+  try
     daq.bitarray.chunks[1] = daq_code(daq,str)
-    daq.pyarray[:] = bitarray
-    daq.task[:WriteDigitalLines](1,1,10.0,pyDAQmx[:DAQmx_Val_GroupByChannel],
+    daq.pyarray[:] = daq.bitarray
+    daq.task[:WriteDigitalLines](1,1,10.0,group_by_channel,
                                  daq.pyarray,nothing,nothing)
     reinterpret(Int,daq.bitarray.chunks[1])
   catch e
@@ -92,6 +93,13 @@ function daq_write(daq::DAQmx,str::String)
 	  error("NI-DAQ Serial port error: "*daq_message(e)*
 		    "\n Python Stacktrace:\n"*string(e))
     else rethrow(e) end
+  end
+end
+
+function setup(fn::Function,e::Weber.ExtendedExperiment{DAQmx})
+  setup(e.next_extension) do
+    addcolumn(:daq_code)
+    fn()
   end
 end
 
