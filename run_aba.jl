@@ -1,11 +1,16 @@
 #!/usr/bin/env julia
 
+# different code for each of the three repetiats
+# in the trial
+# code for the very first
+
 using Weber
+using Weber.Cedrus
 include("calibrate.jl")
 include("stimtrak.jl")
 setup_sound(buffer_size=buffer_size)
 
-version = v"0.1.1"
+version = v"0.1.2"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
@@ -37,18 +42,22 @@ medium = 6st
 medium_str = "6st"
 stimuli = Dict(:low => aba(3st),:medium => aba(medium),:high => aba(18st))
 
-isresponse(e) = iskeydown(e,key"p") ||
-                iskeydown(e,key"q")
+stream_1 = key"p" #key":cedrus2:"
+stream_2 = key"q" #key":cedrus5:"
 
-function create_aba(stimulus;info...)
+isresponse(e) = iskeydown(e,stream_1) || iskeydown(e,stream_2)
+
+function create_aba(stimulus,index,isfirst;info...)
+  prefix = isfirst? "first_" : ""
+  
   [moment(play,stimuli[stimulus]),
-   moment(record,"stimulus",stimulus=stimulus;info...)]
+   moment(record,prefix*"stimulus_$index",stimulus=stimulus;info...)]
 end
 
 # runs an entire trial
 function practice_trial(stimulus;limit=trial_spacing,info...)
-   resp = response(key"q" => "stream_1",
-                   key"p" => "stream_2";info...)
+   resp = response(stream_1 => "stream_1",
+                   stream_2 => "stream_2";info...)
 
   waitlen = aba_SOA*stimuli_per_response+limit
   min_wait = aba_SOA*stimuli_per_response+trial_spacing
@@ -64,19 +73,19 @@ function practice_trial(stimulus;limit=trial_spacing,info...)
   [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),await]
 end
 
-function real_trial(stimulus;limit=trial_spacing,info...)
-   resp = response(key"q" => "stream_1",
-                   key"p" => "stream_2";info...)
-  stim = [create_aba(stimulus;info...),moment(aba_SOA)]
+function real_trial(stimulus,isfirst;limit=trial_spacing,info...)
+  stimuli = map(1:stimuli_per_response) do index
+    resp = response(stream_1 => "stream_1",
+                    stream_2 => "stream_2";info...)
+    [create_aba(stimulus,index,isfirst;info...),moment(aba_SOA)]
+  end
 
-  [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),
-   moment(aba_SOA*stimuli_per_response+limit)]
+  [resp,show_cross(),stimuli,moment(limit)]
 end
 
-
 function validate_trial(stimulus;limit=trial_spacing,info...)
-   resp = response(key"q" => "switches_1_or_0",
-                   key"p" => "switches_2_or_more";info...)
+   resp = response(stream_1 => "switches_1_or_0",
+                   stream_2 => "switches_2_or_more";info...)
   stim = [create_aba(stimulus;info...),moment(aba_SOA)]
 
   [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),
@@ -93,7 +102,7 @@ exp = Experiment(
     :stimulus,:phase,:stimtrak
   ],
   skip=trial_skip,
-  extensions=[stimtrak(stimtrak_port)],
+  extensions=[stimtrak(stimtrak_port),CedrusXID()],
   moment_resolution=moment_resolution,
 )
 
@@ -161,7 +170,7 @@ setup(exp) do
 
   for trial in 1:n_trials
     addbreak_every(n_break_after,n_trials+n_break_after)
-    addtrial(real_trial(:medium,phase="test"))
+    addtrial(real_trial(:medium,phase="test",trial == 1))
   end
 
   message = moment(display,"""
