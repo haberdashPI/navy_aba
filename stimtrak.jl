@@ -10,7 +10,6 @@ stimtrak(port) = daq_extension(
   eeg_sample_rate = 512,
   codes = Dict(
     "trial_start" => start_record,
-    "practice_start" => start_record,
     "break_start" => stop_record,
     "paused" => stop_record,
     "unpaused" => start_record,
