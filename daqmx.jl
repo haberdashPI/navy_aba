@@ -108,13 +108,14 @@ function daq_write(daq::DAQmx,str::String)
 end
 
 function setup(fn::Function,e::Weber.ExtendedExperiment{DAQmx})
-  setup(e.next_extension) do
+  setup(next(e)) do
     addcolumn(:daq_code)
     fn()
   end
 end
 
-function record(e::Weber.ExtendedExperiment{DAQmx},code;kwds...)
-  record(e.next_extension,code;daq_code = daq_write(e.extension,code),kwds...)
+function record(e::ExtendedExperiment{DAQmx},code;kwds...)
+  record(next(e),code;daq_code = daq_write(extension(e),code),kwds...)
 end
+
 end
