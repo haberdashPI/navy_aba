@@ -47,7 +47,7 @@ stream_2 = key"q" #key":cedrus5:"
 
 isresponse(e) = iskeydown(e,stream_1) || iskeydown(e,stream_2)
 
-function create_aba(stimulus,index,isfirst;info...)
+function create_aba(stimulus,index=0,isfirst=false;info...)
   prefix = isfirst? "first_" : ""
   
   [moment(play,stimuli[stimulus]),
@@ -74,9 +74,10 @@ function practice_trial(stimulus;limit=trial_spacing,info...)
 end
 
 function real_trial(stimulus,isfirst;limit=trial_spacing,info...)
+  resp = response(stream_1 => "stream_1",
+                  stream_2 => "stream_2";info...)
+  
   stimuli = map(1:stimuli_per_response) do index
-    resp = response(stream_1 => "stream_1",
-                    stream_2 => "stream_2";info...)
     [create_aba(stimulus,index,isfirst;info...),moment(aba_SOA)]
   end
 
