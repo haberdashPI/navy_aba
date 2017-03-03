@@ -33,7 +33,7 @@ experiment = Experiment(
     :stimulus,:phase,:stimtrak
   ],
   skip=trial_skip,
-  #extensions=[stimtrak(stimtrak_port),Cedrus()],
+  extensions=[stimtrak(stimtrak_port),Cedrus()],
   moment_resolution=moment_resolution,
 )
 
@@ -88,19 +88,19 @@ end
 function real_trial(stimulus;limit=trial_spacing,info...)
   resp = response(stream_1 => "stream_1",
                   stream_2 => "stream_2";info...)
-  [resp,show_cross(),
-   moment(play,stimuli[stimulus]),
+  [moment(limit,play,stimuli[stimulus]),
+   resp,show_cross(),
    moment(record,"stimulus";info...),
-   moment(duration(stimuli[stimulus]) + limit)]
+   moment(duration(stimuli[stimulus]))]
 end
 
 function validate_trial(stimulus;limit=trial_spacing,info...)
   resp = response(stream_1 => "no_switches",
                   stream_2 => "switches";info...)
-  [resp,show_cross(),
-   moment(play,stimuli[stimulus]),
+  [moment(limit,play,stimuli[stimulus]),
+   resp,show_cross(),
    moment(record,"stimulus";info...),
-   moment(duration(stimuli[stimulus]) + limit)]
+   moment(duration(stimuli[stimulus]))]
 end
 
 function cedrus_instruct(str)
