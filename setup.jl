@@ -1,5 +1,7 @@
-Pkg.add("Weber",v"0.3.2")
-Pkg.add("SerialPorts")
+Pkg.checkout("Weber")
+Pkg.clone("https://github.com/haberdashPI/WeberDAQmx.jl")
+Pkg.clone("https://github.com/haberdashPI/WeberCedrus.jl")
+
 if !isfile("calibrate.jl")
   open("calibrate.jl","w") do s
     print(s,"""

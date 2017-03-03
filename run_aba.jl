@@ -8,14 +8,27 @@
 # code for the very first
 
 using Weber
-using Weber.Cedrus
+using WeberCedrus
 include("calibrate.jl")
 include("stimtrak.jl")
 setup_sound(buffer_size=buffer_size)
 
-version = v"0.1.2"
+version = v"0.2.0"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
+
+experiment = Experiment(
+  columns = [
+    :sid => sid,
+    :condition => "pilot",
+    :version => version,
+    :separation => medium_str,
+    :stimulus,:phase,:stimtrak
+  ],
+  skip=trial_skip,
+  extensions=[stimtrak(stimtrak_port),Cedrus()],
+  moment_resolution=moment_resolution,
+)
 
 const ms = 1/1000
 const st = 1/12
@@ -35,28 +48,22 @@ n_validate_trials = 2n_break_after
 
 n_repeat_example = 30
 
-function aba(step)
+function aba(step,repeat=stimuli_per_response)
   A = ramp(tone(A_freq,tone_len))
   B = ramp(tone(A_freq * 2^step,tone_len))
   gap = silence(tone_SOA-tone_len)
-  attenuate([A;gap;B;gap;A],atten_dB)
+  aba = attenuate([A;gap;B;gap;A],atten_dB)
+  aba_ = [aba;silence(aba_SOA-duration(aba))]
+  reduce(vcat,repeated(aba_,repeat))
 end
 
+low = 3st
 medium = 6st
+high = 18st
 medium_str = "6st"
-stimuli = Dict(:low => aba(3st),:medium => aba(medium),:high => aba(18st))
-
-stream_1 = key":cedrus2:"
-stream_2 = key":cedrus5:"
+stimuli = Dict(:medium => aba(medium))
 
 isresponse(e) = iskeydown(e,stream_1) || iskeydown(e,stream_2)
-
-function create_aba(stimulus,index=0,isfirst=false;info...)
-  prefix = isfirst? "first_" : ""
-  
-  [moment(play,stimuli[stimulus]),
-   moment(record,prefix*"stimulus_$index",stimulus=stimulus;info...)]
-end
 
 # runs an entire trial
 function practice_trial(stimulus;limit=trial_spacing,info...)
@@ -72,46 +79,29 @@ function practice_trial(stimulus;limit=trial_spacing,info...)
     record("response_timeout";info...)
   end
 
-  stim = [create_aba(stimulus;info...),moment(aba_SOA)]
-
-  [resp,show_cross(),moment(repeated(stim,stimuli_per_response)),await]
+  [resp,show_cross(),
+   moment(play,stimuli[stimulus]),
+   moment(record,"stimulus";info...),
+   await]
 end
 
-function real_trial(stimulus,isfirst;limit=trial_spacing,info...)
+function real_trial(stimulus;limit=trial_spacing,info...)
   resp = response(stream_1 => "stream_1",
                   stream_2 => "stream_2";info...)
-  
-  stimuli = map(1:stimuli_per_response) do index
-    [create_aba(stimulus,index,isfirst;info...),moment(aba_SOA)]
-  end
-
-  [resp,show_cross(),stimuli,moment(limit)]
+  [resp,show_cross(),
+   moment(play,stimuli[stimulus]),
+   moment(record,"stimulus";info...),
+   moment(duration(stimuli[stimulus]) + limit)]
 end
 
-function validate_trial(stimulus,isfirst;limit=trial_spacing,info...)
-  resp = response(stream_1 => "switches_1_or_0",
-                  stream_2 => "switches_2_or_more";info...)
-
-  stimuli = map(1:stimuli_per_response) do index
-    [create_aba(stimulus,index,isfirst;info...),moment(aba_SOA)]
-  end
-
-  [resp,show_cross(),stimuli,moment(limit)]
+function validate_trial(stimulus;limit=trial_spacing,info...)
+  resp = response(stream_1 => "no_switches",
+                  stream_2 => "switches";info...)
+  [resp,show_cross(),
+   moment(play,stimuli[stimulus]),
+   moment(record,"stimulus";info...),
+   moment(duration(stimuli[stimulus]) + limit)]
 end
-
-
-exp = Experiment(
-  columns = [
-    :sid => sid,
-    :condition => "pilot",
-    :version => version,
-    :separation => medium_str,
-    :stimulus,:phase,:stimtrak
-  ],
-  skip=trial_skip,
-  extensions=[stimtrak(stimtrak_port),CedrusXID()],
-  moment_resolution=moment_resolution,
-)
 
 function cedrus_instruct(str)
   text = visual(str*" (Hit \"M\" key to continue...)")
@@ -119,10 +109,10 @@ function cedrus_instruct(str)
     record("instructions")
     display(text)
   end
-  [m,await_response(iskeydown(key":cedrus3:"))]
+  [m,await_response(iskeydown(end_break_key))]
 end
 
-setup(exp) do
+setup(experiment) do
   addbreak(moment(record,"start"))
 
   addbreak(
@@ -137,24 +127,22 @@ setup(exp) do
       For instance, the following example will normally seem to have
       a galloping-like rhythm."""))
 
-  addpractice(show_cross(),
-              repeated([create_aba(:low,phase="practice"),moment(aba_SOA)],
-                       n_repeat_example))
+  example1 = aba(low,n_repeat_example)
+  addpractice(show_cross(),moment(play,example1),moment(duration(example1)))
 
   addbreak(cedrus_instruct("""
 
-      On the other hand, normally the following example will not appear 
+      On the other hand, normally the following example will not appear
       to gallop."""))
 
-  addpractice(show_cross(),
-              repeated([create_aba(:high,phase="practice"),moment(aba_SOA)],
-                       n_repeat_example))
+  example2 = aba(high,n_repeat_example)
+  addpractice(show_cross(),moment(play,example2),moment(duration(example2)))
 
   addbreak(
     cedrus_instruct("""
 
       In this experiment we'll be asking you to listen for whether it appears
-      that the tones "gallop", or do not."""),
+      that the tones "gallop", or not."""),
 
     cedrus_instruct("""
 
@@ -162,7 +150,7 @@ setup(exp) do
       a gallop or something else. Let's practice a bit.  Use the orange button
       to indicate that you heard a "gallop" most of the time, and otherwise use
       the yellow button.
-      
+
       """))
 
   addpractice(
@@ -181,37 +169,42 @@ setup(exp) do
 
   addbreak(cedrus_instruct("""
 
-    In the real expeirment, try to respond before the next trial begins, but
-    even if you don't please still respond."""))
+    During the expeirment, try to respond before the next trial begins, but
+    even if you don't, please still respond."""))
 
   anykey = moment(display,"Hit any key to start the real experiment...")
   addbreak(anykey,await_response(iskeydown))
 
+  total_breaks = n_trials / n_break_after + 1
   for trial in 1:n_trials
-    addbreak_every(n_break_after,n_trials+n_break_after/2)
-    addtrial(real_trial(:medium,phase="test",trial == 1))
+    if trial % n_break_after == 0
+      n = div(trial,n_break_after)
+      addbreak(cedrus_instruct("You can now take a break (break $n of $total_breaks)"),
+               await_response(iskeydown(end_break_key)))
+    end
+    addtrial(real_trial(:medium,phase="test"))
   end
 
   message = moment(display,"""
   Almost done! Please contact the experimenter before you continue.
   """)
-  addbreak(message,await_response(iskeydown(key"`")))
+  addbreak(message,await_response(iskeydown(end_break_key)))
 
   addbreak(cedrus_instruct("""
-    You may have noticed that, on occasion, within a single trial,
-    the sound switches between gallping and not galloping multiple times.
+    You may have noticed that, on occasion, in the middle of a trial,
+    the sound switches between gallping and not galloping.
   """),
   cedrus_instruct("""
-    In the following trials hit orange if you hear one or no switches. Hit 
-    the yellow if you hear more than one switch in a single trial.
-    It is possible you will never hit one of the buttons.
+    In the following trials hit the orange key if you hear galloping for the
+    entire trial OR if you never hear it. Hit the yellow key if you hear
+    galloping for PART of the time, but NOT all of the time.
   """))
 
   for trial in 1:n_validate_trials
     addbreak_every(n_break_after,n_validate_trials)
-    addtrial(validate_trial(:medium,phase="validate",trial == 1))
+    addtrial(validate_trial(:medium,phase="validate"))
   end
 end
 
 play(attenuate(ramp(tone(1000,1)),atten_dB))
-run(exp)
+run(experiment)
