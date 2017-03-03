@@ -11,11 +11,18 @@ using Weber
 using WeberCedrus
 include("calibrate.jl")
 include("stimtrak.jl")
-setup_sound(buffer_size=buffer_size)
 
 version = v"0.2.0"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
+
+const ms = 1/1000
+const st = 1/12
+
+low = 3st
+medium = 6st
+high = 18st
+medium_str = "6st"
 
 experiment = Experiment(
   columns = [
@@ -26,12 +33,9 @@ experiment = Experiment(
     :stimulus,:phase,:stimtrak
   ],
   skip=trial_skip,
-  extensions=[stimtrak(stimtrak_port),Cedrus()],
+  #extensions=[stimtrak(stimtrak_port),Cedrus()],
   moment_resolution=moment_resolution,
 )
-
-const ms = 1/1000
-const st = 1/12
 
 tone_len = 73ms
 tone_SOA = 175ms
@@ -57,10 +61,6 @@ function aba(step,repeat=stimuli_per_response)
   reduce(vcat,repeated(aba_,repeat))
 end
 
-low = 3st
-medium = 6st
-high = 18st
-medium_str = "6st"
 stimuli = Dict(:medium => aba(medium))
 
 isresponse(e) = iskeydown(e,stream_1) || iskeydown(e,stream_2)
@@ -104,7 +104,7 @@ function validate_trial(stimulus;limit=trial_spacing,info...)
 end
 
 function cedrus_instruct(str)
-  text = visual(str*" (Hit \"M\" key to continue...)")
+  text = visual(str*" (Wait for experimenter to press continue...)")
   m = moment() do
     record("instructions")
     display(text)
