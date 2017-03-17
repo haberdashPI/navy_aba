@@ -9,6 +9,7 @@
 
 using Weber
 using WeberCedrus
+using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
 
@@ -51,6 +52,10 @@ n_break_after = 75
 n_validate_trials = 2n_break_after
 
 n_repeat_example = 30
+
+oddball_length = 1
+oddball_SOA = 2
+oddball_freq = .2
 
 function aba(step,repeat=stimuli_per_response)
   A = ramp(tone(A_freq,tone_len))
@@ -103,7 +108,7 @@ function validate_trial(stimulus;limit=trial_spacing,info...)
    moment(duration(stimuli[stimulus]))]
 end
 
-function cedrus_instruct(str)
+function myinstruct(str)
   text = visual(str*" (Wait for experimenter to press continue...)")
   m = moment() do
     record("instructions")
@@ -115,13 +120,13 @@ end
 setup(experiment) do
   addbreak(moment(250ms,play,@> tone(1000,1) ramp attenuate(atten_dB)))
   addbreak(
-    cedrus_instruct("""
+    myinstruct("""
 
       In each trial of the present experiment you will hear a series of beeps.
       This may appear to proceeded in a galloping rhythm or it may sound like
       two distinct series of tones."""),
 
-    cedrus_instruct("""
+    myinstruct("""
 
       For instance, the following example will normally seem to have
       a galloping-like rhythm."""))
@@ -129,7 +134,7 @@ setup(experiment) do
   example1 = aba(low,n_repeat_example)
   addpractice(show_cross(),moment(250ms,play,example1),moment(duration(example1)))
 
-  addbreak(cedrus_instruct("""
+  addbreak(myinstruct("""
 
       On the other hand, normally the following example will not appear
       to gallop."""))
@@ -138,12 +143,12 @@ setup(experiment) do
   addpractice(show_cross(),moment(play,example2),moment(duration(example2)))
 
   addbreak(
-    cedrus_instruct("""
+    myinstruct("""
 
       In this experiment we'll be asking you to listen for whether it appears
       that the tones "gallop", or not."""),
 
-    cedrus_instruct("""
+    myinstruct("""
 
       Every once in a while, we want you to indicate what you heard most often,
       a gallop or something else. Let's practice a bit.  Use the orange button
@@ -156,7 +161,7 @@ setup(experiment) do
     repeated(practice_trial(:medium,phase="practice",limit=10trial_spacing),
              num_practice_trials))
 
-  addbreak(cedrus_instruct("""
+  addbreak(myinstruct("""
 
     In the real experiment, your time to respond will be limited. Let's
     try another practice round, this time a little bit faster.
@@ -166,7 +171,7 @@ setup(experiment) do
     repeated(practice_trial(:medium,phase="practice",limit=2trial_spacing),
              num_practice_trials))
 
-  addbreak(cedrus_instruct("""
+  addbreak(myinstruct("""
 
     During the expeirment, try to respond before the next trial begins, but
     even if you don't, please still respond."""))
@@ -182,8 +187,7 @@ setup(experiment) do
       marker = moment(record,"experiment_start")
     elseif trial % n_break_after == 1
       n = div(trial,n_break_after)
-      addbreak(cedrus_instruct("You can now take a break (break $n of $total_breaks)"),
-               await_response(iskeydown(end_break_key)))
+      addbreak(myinstruct("You can now take a break (break $n of $total_breaks)"))
       marker = moment(record,"block_start")
     else
       marker = moment()
@@ -197,11 +201,11 @@ setup(experiment) do
   """)
   addbreak(message,await_response(iskeydown(end_break_key)))
 
-  addbreak(cedrus_instruct("""
+  addbreak(myinstruct("""
     You may have noticed that, on occasion, in the middle of a trial,
     the sound switches between gallping and not galloping.
   """),
-  cedrus_instruct("""
+  myinstruct("""
     In the following trials hit the orange key if you hear galloping for the
     entire trial OR if you never hear it. Hit the yellow key if you hear
     galloping for PART of the time, but NOT all of the time.
@@ -210,10 +214,46 @@ setup(experiment) do
   for trial in 1:n_validate_trials
     if trial > 1 && trial % n_break_after == 1
       n = div(trial,n_break_after) + div(n_trials,n_break_after)
-      addbreak(cedrus_instruct("You can now take a break (break $n of $total_breaks)"),
-               await_response(iskeydown(end_break_key)))
+      addbreak(myinstruct("You can now take a break (break $n of $total_breaks)"))
+      marker = moment(record,"block_start")
+    else
+      marker = moment()
     end
-    addtrial(validate_trial(:medium,phase="validate"))
+
+    addtrial(marker,validate_trial(:medium,phase="validate"))
+  end
+
+  instruction_image = load(joinpath("Images","oddball.png"))
+  addbreak(moment(display,instruction_image),
+           moment(record,"instructions"),
+           await_response(iskeydown(end_break_key)))
+
+  A = @> tone(A_freq,oddball_length) ramp attenuate(atten_dB)
+  B = @> tone(A_freq * 2^medium,oddball_length) ramp attenuate(atten_dB)
+
+  n_oddballs = 35
+  n_standards = 150
+  oddball_n_stimuli = n_oddballs + n_standards
+  last_stim = "standard"
+  oddballs_left = n_oddballs
+  standards_left = n_standards
+
+  for trial in 1:oddball_n_stimuli
+    stimuli_left = oddballs_left + standards_left
+    oddball_chance = oddballs_left / (stimuli_left - n_oddballs)
+
+    if last_stim == "standard" && rand() < oddball_chance
+      stim = B
+      last_stim = stim_name = "oddball"
+      oddballs_left -= 1
+    else
+      stim = A
+      last_stim = stim_name = "standard"
+      standards_left -= 1
+    end
+
+    resp =  response(oddball_key => "oddball_hit")
+    addtrial(show_cross(),resp,moment(play,stim),moment(record,stim_name),moment(oddball_SOA))
   end
 end
 
