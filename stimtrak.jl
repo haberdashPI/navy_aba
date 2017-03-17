@@ -22,6 +22,8 @@ stimtrak(port) = daq_extension(
     "no_switches_up" => 6,
     "switches" => 7,
     "switches_up" => 8,
-    "stimulus" => 9
+    "stimulus" => 9,
+    "experiment_start" => 10,
+    "block_start" => 11
   )
 )
