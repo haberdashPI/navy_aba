@@ -113,8 +113,7 @@ function cedrus_instruct(str)
 end
 
 setup(experiment) do
-  addbreak(moment(record,"start"))
-
+  addbreak(moment(250ms,play,@> tone(1000,1) ramp attenuate(atten_dB)))
   addbreak(
     cedrus_instruct("""
 
@@ -128,7 +127,7 @@ setup(experiment) do
       a galloping-like rhythm."""))
 
   example1 = aba(low,n_repeat_example)
-  addpractice(show_cross(),moment(play,example1),moment(duration(example1)))
+  addpractice(show_cross(),moment(250ms,play,example1),moment(duration(example1)))
 
   addbreak(cedrus_instruct("""
 
@@ -175,14 +174,22 @@ setup(experiment) do
   anykey = moment(display,"Hit any key to start the real experiment...")
   addbreak(anykey,await_response(iskeydown))
 
-  total_breaks = n_trials / n_break_after + 1
+  total_breaks = div(n_trials,n_break_after) +
+    div(n_validate_trials,n_break_after)
+
   for trial in 1:n_trials
-    if trial % n_break_after == 0
+    if trial == 1
+      marker = moment(record,"experiment_start")
+    elseif trial % n_break_after == 1
       n = div(trial,n_break_after)
       addbreak(cedrus_instruct("You can now take a break (break $n of $total_breaks)"),
                await_response(iskeydown(end_break_key)))
+      marker = moment(record,"block_start")
+    else
+      marker = moment()
     end
-    addtrial(real_trial(:medium,phase="test"))
+
+    addtrial(marker,real_trial(:medium,phase="test"))
   end
 
   message = moment(display,"""
@@ -201,10 +208,13 @@ setup(experiment) do
   """))
 
   for trial in 1:n_validate_trials
-    addbreak_every(n_break_after,n_validate_trials)
+    if trial > 1 && trial % n_break_after == 1
+      n = div(trial,n_break_after) + div(n_trials,n_break_after)
+      addbreak(cedrus_instruct("You can now take a break (break $n of $total_breaks)"),
+               await_response(iskeydown(end_break_key)))
+    end
     addtrial(validate_trial(:medium,phase="validate"))
   end
 end
 
-play(attenuate(ramp(tone(1000,1)),atten_dB))
 run(experiment)
