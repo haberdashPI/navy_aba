@@ -12,10 +12,14 @@ using WeberCedrus
 using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
+include("oddball.jl")
 
 version = v"0.2.0"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
+
+################################################################################
+# settings
 
 const ms = 1/1000
 const st = 1/12
@@ -24,19 +28,6 @@ low = 3st
 medium = 6st
 high = 18st
 medium_str = "6st"
-
-experiment = Experiment(
-  columns = [
-    :sid => sid,
-    :condition => "pilot",
-    :version => version,
-    :separation => medium_str,
-    :stimulus,:phase,:stimtrak
-  ],
-  skip=trial_skip,
-  extensions=[stimtrak(stimtrak_port),Cedrus()],
-  moment_resolution=moment_resolution,
-)
 
 tone_len = 73ms
 tone_SOA = 175ms
@@ -56,6 +47,25 @@ n_repeat_example = 30
 oddball_length = 1
 oddball_SOA = 2
 oddball_freq = .2
+
+n_oddballs = 35
+n_standards = 150
+
+################################################################################
+# expeirment and trial definitions
+
+experiment = Experiment(
+  columns = [
+    :sid => sid,
+    :condition => "pilot",
+    :version => version,
+    :separation => medium_str,
+    :stimulus,:phase,:stimtrak
+  ],
+  skip=trial_skip,
+  extensions=[stimtrak(stimtrak_port),Cedrus()],
+  moment_resolution=moment_resolution,
+)
 
 function aba(step,repeat=stimuli_per_response)
   A = ramp(tone(A_freq,tone_len))
@@ -117,6 +127,9 @@ function myinstruct(str)
   [m,await_response(iskeydown(end_break_key))]
 end
 
+################################################################################
+# instructions and trial setup
+
 setup(experiment) do
   addbreak(moment(250ms,play,@> tone(1000,1) ramp attenuate(atten_dB)))
   addbreak(
@@ -151,9 +164,9 @@ setup(experiment) do
     myinstruct("""
 
       Every once in a while, we want you to indicate what you heard most often,
-      a gallop or something else. Let's practice a bit.  Use the orange button
+      a gallop or something else. Let's practice a bit.  Use the yellow button
       to indicate that you heard a "gallop" most of the time, and otherwise use
-      the yellow button.
+      the orange button.
 
       """))
 
@@ -206,8 +219,8 @@ setup(experiment) do
     the sound switches between gallping and not galloping.
   """),
   myinstruct("""
-    In the following trials hit the orange key if you hear galloping for the
-    entire trial OR if you never hear it. Hit the yellow key if you hear
+    In the following trials hit the yellow key if you hear galloping for the
+    entire trial OR if you never hear it. Hit the orange key if you hear
     galloping for PART of the time, but NOT all of the time.
   """))
 
@@ -231,37 +244,18 @@ setup(experiment) do
   A = @> tone(A_freq,oddball_length) ramp attenuate(atten_dB)
   B = @> tone(A_freq * 2^medium,oddball_length) ramp attenuate(atten_dB)
 
-  n_oddballs = 35
-  n_standards = 150
-  oddball_n_stimuli = n_oddballs + n_standards
-  last_stim = "standard"
-  oddballs_left = n_oddballs
-  standards_left = n_standards
-
-  for trial in 1:oddball_n_stimuli
-    # simple version
-    # if rand() < 0.2
-    #   stim = B
-    #   stim_name = "oddball"
-    # else
-    #   stim = A
-    #   stim_name = "standard"
-    # end
-    stimuli_left = oddballs_left + standards_left
-    oddball_chance = oddballs_left / (stimuli_left - n_oddballs)
-
-    if last_stim == "standard" && rand() < oddball_chance
+  oddball_paradigm(n_oddballs,n_standards,lead=20) do isoddball
+    if isoddball
       stim = B
-      last_stim = stim_name = "oddball"
-      oddballs_left -= 1
+      stim_name = "oddball"
     else
       stim = A
-      last_stim = stim_name = "standard"
-      standards_left -= 1
+      stim_name = "standard"
     end
 
     resp =  response(oddball_key => "oddball_hit")
-    addtrial(show_cross(),resp,moment(play,stim),moment(record,stim_name),moment(oddball_SOA))
+    addtrial(show_cross(),resp,moment(play,stim),
+             moment(record,stim_name),moment(oddball_SOA))
   end
 end
 
