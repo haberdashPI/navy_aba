@@ -239,6 +239,14 @@ setup(experiment) do
   standards_left = n_standards
 
   for trial in 1:oddball_n_stimuli
+    # simple version
+    # if rand() < 0.2
+    #   stim = B
+    #   stim_name = "oddball"
+    # else
+    #   stim = A
+    #   stim_name = "standard"
+    # end
     stimuli_left = oddballs_left + standards_left
     oddball_chance = oddballs_left / (stimuli_left - n_oddballs)
 
