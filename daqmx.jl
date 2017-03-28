@@ -50,6 +50,7 @@ codes during eeg recording.
 daq_extension(::Void;codes=nothing,eeg_sample_rate=nothing) = EmptyDAQmx()
 function daq_extension(port::String;codes=Dict{String,Int}(),
                        eeg_sample_rate=nothing)
+  @assert eeg_sample_rate != nothing
   # code clearing waits just a little longer than one eeg sample
   wait_len = 1.25/eeg_sample_rate
 
