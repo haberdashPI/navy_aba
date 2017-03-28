@@ -47,6 +47,7 @@ data_stim = data %>%
     mutate(resp = last(TriNo[TriNo %in% c(1,2)])) %>%
     filter(TriNo %in% 7:9) %>%
     ungroup() %>%
+    mutate(real_resp = ifelse(is.na(resp),0,resp)) %>%
     fill(resp) %>%
     mutate(switching = ifelse(trial != lag(trial),resp != lag(resp),NA)) %>%
     fill(switching)
@@ -55,13 +56,17 @@ data_stim[data_stim$trial == 2,'switching'] = FALSE
 
 # TODO: how do we handle missed trial responses?
 
-data_stim %>%
+events = data_stim %>%
     mutate(Tmu = onset*10**6) %>%
-    mutate(TriNo = TriNo*100 + resp*10 + switching) %>%
+    mutate(TriNo = TriNo*100 + real_resp*10 + switching) %>%
     mutate(Code = 1) %>%
-    mutate(Comnt = paste('Trig.',TriNo)) %>%
-    select(Tmu,TriNo,Code,Comnt) %>%
-    write.csv(paste('david_stim_events_',Sys.Date(),'.csv',sep=''),row.names=F)
+    mutate(Comnt = '') %>%
+    select(Tmu,Code,TriNo,Comnt) %>%
+    mutate(TriNo = as.character(TriNo))
+
+write.table(rbind(data.frame(Tmu=0,Code=41,TriNo="2017-02-23T10:04:35.000",Comnt=""),events),
+            paste('david_stim_events_',Sys.Date(),'.evt',sep=''),
+            row.names=F,sep='\t',quote=F)
 
 
 ## TODO: code for individual beeps in aba, based on assumptions
