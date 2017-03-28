@@ -29,6 +29,24 @@ isdaq_error(e::PyCall.PyError) = e.T == pyDAQmx[:DAQmxFunctions][:DAQError]
 isdaq_error(e) = false
 daq_message(e::PyCall.PyError) = e.val[:mess]
 
+"""
+    daq_extension(port;eeg_sample_rate,[codes])
+
+Create a Weber extension that writes `record` events to a digital 
+out line via the DAQmx API. This can be used to send trigger 
+codes during eeg recording.
+
+# Arguments
+
+* port: should be `nothing`, to disable the extension, or 
+  the port name for the digital output line.
+* eeg_sample_rate: should be set to the sampling rate for
+  eeg recording. This calibrates the code length for triggers.
+* codes: a Dict that maps record event codes (a string) to a number.
+  This should be an Integer less than 256. Any codes not
+  specified here will be automatically set, based on the order
+  in which codes are recieved.
+"""
 daq_extension(::Void;codes=nothing,eeg_sample_rate=nothing) = EmptyDAQmx()
 function daq_extension(port::String;codes=Dict{String,Int}(),
                        eeg_sample_rate=nothing)
