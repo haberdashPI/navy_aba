@@ -7,7 +7,7 @@ motivated by the following work:
 
 Pitts, M. A., & Britz, J. (2011). Insights from Intermittent Binocular Rivalry and EEG. Frontiers in Human Neuroscience, 5. https://doi.org/10.3389/fnhum.2011.00107
 
-# Installation
+# Running the experiment
 
 You need to install julia, and then run the setup.jl script.
 
@@ -19,8 +19,6 @@ One way to do this is as follows:
 3. Open the setup.jl file for this project in Juno.
 4. Run setup.jl in Juno (e.g. Julia > Run File).
 5. call `using Weber` to verify the installation (you may need to restart Julia).
-
-# Running
 
 If you installed Juno (see above) just run `run_aba.jl` in Juno.  Make
 sure you have the console open (Julia > Open Console), as you will be prompted
@@ -40,3 +38,13 @@ number. This number is also saved on each line of the data recorded during
 the experiment. You can use this number to call `run_aba.jl` starting from
 somewhere in the middle of the experiment.
 
+# Analyzing the data
+
+Analysis uses [R](https://www.r-project.org/) and
+[anaconda](https://www.continuum.io/downloads) python. All analyses are located
+in the anlaysis folder. 
+
+## BDFs
+
+The raw BDFs for eeg data are not stored directly in the git repository, as they are quite
+large. 
