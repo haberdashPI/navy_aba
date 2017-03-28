@@ -21,7 +21,7 @@ by_context = by_time %>%
 legend = guide_legend(title='Context Stimulus')
 ggplot(subset(by_context,sid == 0005),
 	   aes(x=time,y=response)) +
-	geom_line() + 
+	geom_line() +
 	theme_classic() + ylab('% streaming') + xlab('time (s)')
 
 #ggsave(paste('data/speech_streaming_joel_',Sys.Date(),'.pdf',sep=''))

@@ -3,3 +3,4 @@
 *~
 program/calibrate.jl
 *.bdf
+plots/
