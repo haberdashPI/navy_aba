@@ -14,7 +14,7 @@ include("calibrate.jl")
 include("stimtrak.jl")
 include("oddball.jl")
 
-version = v"0.2.0"
+version = v"0.2.1"
 sid,trial_skip =
   @read_args("Runs an intermittant aba experiment, version $version.")
 
@@ -62,6 +62,7 @@ experiment = Experiment(
     :separation => medium_str,
     :stimulus,:phase,:stimtrak
   ],
+  data_dir=joinpath("..","data","csv"),
   skip=trial_skip,
   extensions=[stimtrak(stimtrak_port),Cedrus()],
   moment_resolution=moment_resolution,
