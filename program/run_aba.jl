@@ -42,7 +42,7 @@ num_practice_trials = 12
 n_break_after = 75
 n_validate_trials = 2n_break_after
 
-n_repeat_example = 30
+n_repeat_example = 20
 
 oddball_length = 1
 oddball_SOA = 2
@@ -133,28 +133,26 @@ end
 
 setup(experiment) do
   addbreak(moment(250ms,play,@> tone(1000,1) ramp attenuate(atten_dB)))
-  addbreak(
-    myinstruct("""
 
-      In each trial of the present experiment you will hear a series of beeps.
-      This may appear to proceeded in a galloping rhythm or it may sound like
-      two distinct series of tones."""),
-
-    myinstruct("""
-
-      For instance, the following example will normally seem to have
-      a galloping-like rhythm."""))
+  instruction_image1 = load(joinpath("Images","navy_aba_01.png"))
+  instruction_image2 = load(joinpath("Images","navy_aba_02.png"))
+  instruction_image3 = load(joinpath("Images","navy_aba_03.png"))
 
   example1 = aba(low,n_repeat_example)
-  addpractice(show_cross(),moment(250ms,play,example1),moment(duration(example1)))
-
-  addbreak(myinstruct("""
-
-      On the other hand, normally the following example will not appear
-      to gallop."""))
+  addbreak(
+    moment(display,instruction_image1),
+    await_response(iskeydown(end_break_key)),
+    show_cross(),moment(250ms,play,example1),moment(duration(example1)),
+    moment(display,instruction_image1),
+    await_response(iskeydown(end_break_key)),
+    moment(display,instruction_image2),
+    await_response(iskeydown(end_break_key)))
 
   example2 = aba(high,n_repeat_example)
-  addpractice(show_cross(),moment(play,example2),moment(duration(example2)))
+  addbreak(
+    moment(display,instruction_image3),
+    await_response(iskeydown(end_break_key)),
+    show_cross(),moment(play,example2),moment(duration(example2)))
 
   addbreak(
     myinstruct("""
@@ -215,15 +213,9 @@ setup(experiment) do
   """)
   addbreak(message,await_response(iskeydown(end_break_key)))
 
-  addbreak(myinstruct("""
-    You may have noticed that, on occasion, in the middle of a trial,
-    the sound switches between gallping and not galloping.
-  """),
-  myinstruct("""
-    In the following trials hit the yellow key if you hear galloping for the
-    entire trial OR if you never hear it. Hit the orange key if you hear
-    galloping for PART of the time, but NOT all of the time.
-  """))
+  instruction_image4 = load(joinpath("Images","navy_aba_04.png"))
+  addbreak(moment(display,instruction_image4),
+    await_response(iskeydown(end_break_key)))
 
   for trial in 1:n_validate_trials
     if trial > 1 && trial % n_break_after == 1
