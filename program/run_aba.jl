@@ -12,7 +12,6 @@ using WeberCedrus
 using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
-include("oddball.jl")
 
 version = v"0.2.1"
 sid,trial_skip =
@@ -44,12 +43,6 @@ n_validate_trials = 2n_break_after
 
 n_repeat_example = 20
 
-oddball_length = 1
-oddball_SOA = 2
-oddball_freq = .2
-
-n_oddballs = 35
-n_standards = 150
 
 ################################################################################
 # expeirment and trial definitions
@@ -227,28 +220,6 @@ setup(experiment) do
     end
 
     addtrial(marker,validate_trial(:medium,phase="validate"))
-  end
-
-  instruction_image = load(joinpath("Images","oddball.png"))
-  addbreak(moment(display,instruction_image),
-           moment(record,"instructions"),
-           await_response(iskeydown(end_break_key)))
-
-  A = @> tone(A_freq,oddball_length) ramp attenuate(atten_dB)
-  B = @> tone(A_freq * 2^medium,oddball_length) ramp attenuate(atten_dB)
-
-  oddball_paradigm(n_oddballs,n_standards,lead=20) do isoddball
-    if isoddball
-      stim = B
-      stim_name = "oddball"
-    else
-      stim = A
-      stim_name = "standard"
-    end
-
-    resp =  response(oddball_key => "oddball_hit")
-    addtrial(show_cross(),resp,moment(play,stim),
-             moment(record,stim_name),moment(oddball_SOA))
   end
 end
 
