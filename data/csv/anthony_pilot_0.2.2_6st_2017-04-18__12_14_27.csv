@@ -1,0 +1,5 @@
+weber_version,start_date,start_time,offset,trial,time,sid,condition,version,separation,code,stimulus,phase,stimtrak,value,daq_code
+0.4.4-dirty,2017-04-18,12:14:27,1,0,0.007870805546644988,anthony,pilot,0.2.2,6st,break_start,,,,,253
+0.4.4-dirty,2017-04-18,12:14:27,1,0,0.5286862309227445,anthony,pilot,0.2.2,6st,high_latency,,,,0.2708154253760995,12
+0.4.4-dirty,2017-04-18,12:14:27,3,0,1.2168005362194663,anthony,pilot,0.2.2,6st,break_start,,,,,253
+0.4.4-dirty,2017-04-18,12:14:27,3,0,109.66376261967503,anthony,pilot,0.2.2,6st,closed,,,,,253
