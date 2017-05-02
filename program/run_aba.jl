@@ -61,7 +61,7 @@ experiment = Experiment(
   moment_resolution=moment_resolution,
 )
 
-function aba(step,repeat=stimuli_per_response)
+function aba(step,tone_len,tone_SOA,aba_SOA,repeat)
   A = ramp(tone(A_freq,tone_len))
   B = ramp(tone(A_freq * 2^step,tone_len))
   gap = silence(tone_SOA-tone_len)
@@ -70,7 +70,7 @@ function aba(step,repeat=stimuli_per_response)
   reduce(vcat,repeated(aba_,repeat))
 end
 
-stimuli = Dict(:medium => aba(medium))
+stimuli = Dict(:medium => aba(medium,tone_len,tone_SOA,aba_SOA,stimuli_per_response))
 
 isresponse(e) = iskeydown(e,stream_1) || iskeydown(e,stream_2)
 
@@ -131,21 +131,42 @@ setup(experiment) do
   instruction_image2 = load(joinpath("Images","navy_aba_02.png"))
   instruction_image3 = load(joinpath("Images","navy_aba_03.png"))
 
-  example1 = aba(low,n_repeat_example)
+  example1 = aba(low,tone_len,tone_SOA,aba_SOA,n_repeat_example)
+
   addbreak(
     moment(display,instruction_image1),
-    await_response(iskeydown(end_break_key)),
-    show_cross(),moment(250ms,play,example1),moment(duration(example1)),
+    await_response(iskeydown(end_break_key)))
+
+  @addtrials let play_example = true
+    @addtrials while play_example
+      addbreak(
+        show_cross(),moment(250ms,play,example1),moment(duration(example1)),
+        moment(display,"Again? [Y / N]"),
+        response -> play_example = iskeydown(response,key"y"),
+        await_response(r -> iskeydown(r,key"y") || iskeydown(r,key"n")))
+    end
+  end
+
+  addbreak(
     moment(display,instruction_image1),
     await_response(iskeydown(end_break_key)),
     moment(display,instruction_image2),
     await_response(iskeydown(end_break_key)))
 
-  example2 = aba(high,n_repeat_example)
+  example2 = aba(high,0.75tone_len,0.75tone_SOA,0.75aba_SOA,n_repeat_example)
+
   addbreak(
     moment(display,instruction_image3),
-    await_response(iskeydown(end_break_key)),
-    show_cross(),moment(play,example2),moment(duration(example2)))
+    await_response(iskeydown(end_break_key)))
+  @addtrials let play_example = true
+    @addtrials while play_example
+      addbreak(
+        show_cross(),moment(play,example2),moment(duration(example2)),
+        moment(display,"Again? [Y / N]"),
+        response -> play_example = iskeydown(response,key"y"),
+        await_response(r -> iskeydown(r,key"y") || iskeydown(r,key"n")))
+    end
+  end
 
   addbreak(
     myinstruct("""
