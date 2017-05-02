@@ -1,0 +1,9 @@
+weber_version,start_date,start_time,offset,trial,time,sid,condition,version,separation,code,stimulus,phase,stimtrak,value,daq_code
+0.4.4-dirty,2017-04-10,09:57:54,11,2,0.0016447523163662936,11,pilot,0.2.2,6st,trial_start,,,,,252
+0.4.4-dirty,2017-04-10,09:57:54,11,2,1.2018284148995235,11,pilot,0.2.2,6st,stimulus,,test,,,9
+0.4.4-dirty,2017-04-10,09:57:54,12,3,3.3031644304706447,11,pilot,0.2.2,6st,trial_start,,,,,252
+0.4.4-dirty,2017-04-10,09:57:54,12,3,4.013736490094573,11,pilot,0.2.2,6st,stimulus,,test,,,9
+0.4.4-dirty,2017-04-10,09:57:54,13,4,6.1138132109904575,11,pilot,0.2.2,6st,trial_start,,,,,252
+0.4.4-dirty,2017-04-10,09:57:54,13,4,6.427837739439184,11,pilot,0.2.2,6st,paused,,,,,253
+0.4.4-dirty,2017-04-10,09:57:54,13,4,8.996406576842503,11,pilot,0.2.2,6st,terminated,,,,,253
+0.4.4-dirty,2017-04-10,09:57:54,13,4,8.996406576842503,11,pilot,0.2.2,6st,closed,,,,,12

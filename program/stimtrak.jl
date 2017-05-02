@@ -13,6 +13,7 @@ stimtrak(port) = daq_extension(
     "paused" => stop_record,
     "unpaused" => start_record,
     "terminated" => stop_record,
+    "closed" => stop_record,
     "UNUSED" => manual_start_record,
     "stream_1" => 1,
     "stream_2" => 2,

@@ -1,0 +1,7 @@
+weber_version,start_date,start_time,offset,trial,time,sid,condition,version,separation,code,stimulus,phase,stimtrak,value,daq_code
+0.4.4-dirty,2017-04-26,12:48:16,1,0,0.008324117417942034,1105,group1,0.3.0,6st,break_start,,,,,253
+0.4.4-dirty,2017-04-26,12:48:16,1,0,0.5246771293313941,1105,group1,0.3.0,6st,high_latency,,,,0.26635301191345206,12
+0.4.4-dirty,2017-04-26,12:48:16,3,0,1.2257168100877607,1105,group1,0.3.0,6st,break_start,,,,,253
+0.4.4-dirty,2017-04-26,12:48:16,3,0,1185.2865486972423,1105,group1,0.3.0,6st,paused,,,,,253
+0.4.4-dirty,2017-04-26,12:48:16,3,0,1198.2133590723242,1105,group1,0.3.0,6st,terminated,,,,,253
+0.4.4-dirty,2017-04-26,12:48:16,3,0,1198.2133590723242,1105,group1,0.3.0,6st,closed,,,,,253

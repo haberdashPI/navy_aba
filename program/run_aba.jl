@@ -13,7 +13,7 @@ using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
 
-version = v"0.2.2"
+version = v"0.3.0"
 sid,trial_skip =
   @read_args("Runs an intermittant aba ``experiment, version $version.")
 
@@ -50,7 +50,7 @@ n_repeat_example = 20
 experiment = Experiment(
   columns = [
     :sid => sid,
-    :condition => "pilot",
+    :condition => "group1",
     :version => version,
     :separation => medium_str,
     :stimulus,:phase,:stimtrak
