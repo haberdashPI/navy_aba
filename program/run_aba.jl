@@ -13,7 +13,7 @@ using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
 
-version = v"0.3.0"
+version = v"0.3.1"
 sid,trial_skip =
   @read_args("Runs an intermittant aba ``experiment, version $version.")
 
