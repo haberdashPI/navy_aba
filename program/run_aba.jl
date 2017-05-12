@@ -125,14 +125,10 @@ end
 setup(experiment) do
   addbreak(moment(250ms,play,@> tone(1kHz,1s) ramp attenuate(atten_dB)))
 
-  instruction_image1 = load(joinpath("Images","navy_aba_01.png"))
-  instruction_image2 = load(joinpath("Images","navy_aba_02.png"))
-  instruction_image3 = load(joinpath("Images","navy_aba_03.png"))
-
   example1 = aba(low,tone_len,tone_SOA,aba_SOA,n_repeat_example)
 
   addbreak(
-    moment(display,instruction_image1),
+    moment(display,joinpath("Images","navy_aba_01.png")),
     await_response(iskeydown(end_break_key)))
 
   @addtrials let play_example = true
@@ -146,15 +142,15 @@ setup(experiment) do
   end
 
   addbreak(
-    moment(display,instruction_image1),
+    moment(display,joinpath("Images","navy_aba_01.png")),
     await_response(iskeydown(end_break_key)),
-    moment(display,instruction_image2),
+    moment(display,joinpath("Images","navy_aba_02.png")),
     await_response(iskeydown(end_break_key)))
 
   example2 = aba(high,0.75tone_len,0.75tone_SOA,0.75aba_SOA,n_repeat_example)
 
   addbreak(
-    moment(display,instruction_image3),
+    moment(display,joinpath("Images","navy_aba_03.png")),
     await_response(iskeydown(end_break_key)))
   @addtrials let play_example = true
     @addtrials while play_example
@@ -227,8 +223,7 @@ setup(experiment) do
   """)
   addbreak(message,await_response(iskeydown(end_break_key)))
 
-  instruction_image4 = load(joinpath("Images","navy_aba_04.png"))
-  addbreak(moment(display,instruction_image4),
+  addbreak(moment(display,joinpath("Images","navy_aba_03.png")),
     await_response(iskeydown(end_break_key)))
 
   for trial in 1:n_validate_trials
