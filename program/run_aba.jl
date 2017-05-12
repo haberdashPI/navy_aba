@@ -9,7 +9,6 @@
 
 using Weber
 using WeberCedrus
-using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
 
@@ -20,7 +19,6 @@ sid,trial_skip =
 ################################################################################
 # settings
 
-const ms = 1/1000
 const st = 1/12
 
 low = 3st
@@ -31,7 +29,7 @@ medium_str = "6st"
 tone_len = 73ms
 tone_SOA = 175ms
 aba_SOA = 4tone_SOA
-A_freq = 400
+A_freq = 400Hz
 
 stimuli_per_response = 3
 trial_spacing = aba_SOA
@@ -67,7 +65,7 @@ function aba(step,tone_len,tone_SOA,aba_SOA,repeat)
   gap = silence(tone_SOA-tone_len)
   aba = attenuate([A;gap;B;gap;A],atten_dB)
   aba_ = [aba;silence(aba_SOA-duration(aba))]
-  reduce(vcat,repeated(aba_,repeat))
+  reduce(vcat,Iterators.repeated(aba_,repeat))
 end
 
 stimuli = Dict(:medium => aba(medium,tone_len,tone_SOA,aba_SOA,stimuli_per_response))
@@ -125,7 +123,7 @@ end
 # instructions and trial setup
 
 setup(experiment) do
-  addbreak(moment(250ms,play,@> tone(1000,1) ramp attenuate(atten_dB)))
+  addbreak(moment(250ms,play,@> tone(1kHz,1s) ramp attenuate(atten_dB)))
 
   instruction_image1 = load(joinpath("Images","navy_aba_01.png"))
   instruction_image2 = load(joinpath("Images","navy_aba_02.png"))
@@ -184,8 +182,9 @@ setup(experiment) do
       """))
 
   addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=10trial_spacing),
-             num_practice_trials))
+    Iterators.repeated(practice_trial(:medium,phase="practice",
+                                      limit=10trial_spacing),
+                       num_practice_trials))
 
   addbreak(myinstruct("""
 
@@ -194,8 +193,9 @@ setup(experiment) do
     """))
 
   addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=2trial_spacing),
-             num_practice_trials))
+    Iterators.repeated(practice_trial(:medium,phase="practice",
+                                      limit=2trial_spacing),
+                       num_practice_trials))
 
   addbreak(myinstruct("""
 
