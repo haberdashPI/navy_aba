@@ -1,14 +1,8 @@
 #!/usr/bin/env julia
 
-# TODO: make sure this shows the right number of breaks.
-# TODO: one longer break in the middle
-
-# different code for each of the three repetiats
-# in the trial
-# code for the very first
+# STUDY 1: Intermittent presentation of ABA- pattern
 
 using Weber
-using WeberCedrus
 include("calibrate.jl")
 include("stimtrak.jl")
 
@@ -41,21 +35,21 @@ n_validate_trials = 2n_break_after
 
 n_repeat_example = 20
 
-
 ################################################################################
-# expeirment and trial definitions
+# experiment and trial definitions
 
 experiment = Experiment(
   columns = [
     :sid => sid,
-    :condition => "pilot",
+    :condition => "study1",
     :version => version,
     :separation => medium_str,
     :stimulus,:phase,:stimtrak
   ],
   data_dir=joinpath("..","data","csv"),
   skip=trial_skip,
-  extensions=[stimtrak(stimtrak_port),Cedrus()],
+  extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
+              @Cedrus()],
   moment_resolution=moment_resolution,
 )
 
