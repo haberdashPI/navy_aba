@@ -45,8 +45,8 @@ experiment = Experiment(
   ],
   data_dir=joinpath("..","data","csv"),
   skip=trial_skip,
-  extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
-              @Cedrus()],
+  # extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
+  #             @Cedrus()],
   moment_resolution=moment_resolution,
 )
 
@@ -74,13 +74,17 @@ function a_trial()
         moment(aba_SOA)
       elseif deviant == :surprise_tone
         moment(aba_SOA,play,mix(an_aba,surprise_tone))
+      else
+        error("Unexpected deviant type $deviant")
       end
     else
       moment(aba_SOA,play,an_aba)
     end
   end
+  abreak = [moment(display,"Hit space to start next trial."),
+            await_response(iskeydown(end_break_key))]
 
-  [resp,stim]
+  [moment(display,colorant"gray"),resp,stim,abreak]
 end
 
 ################################################################################
