@@ -1,15 +1,8 @@
 #!/usr/bin/env julia
 
-# TODO: make sure this shows the right number of breaks.
-# TODO: one longer break in the middle
-
-# different code for each of the three repetiats
-# in the trial
-# code for the very first
+# STUDY 1: Intermittent presentation of ABA- pattern
 
 using Weber
-using WeberCedrus
-using Lazy
 include("calibrate.jl")
 include("stimtrak.jl")
 
@@ -20,7 +13,6 @@ sid,trial_skip =
 ################################################################################
 # settings
 
-const ms = 1/1000
 const st = 1/12
 
 low = 3st
@@ -31,7 +23,7 @@ medium_str = "6st"
 tone_len = 73ms
 tone_SOA = 175ms
 aba_SOA = 4tone_SOA
-A_freq = 400
+A_freq = 400Hz
 
 stimuli_per_response = 3
 trial_spacing = aba_SOA
@@ -43,21 +35,21 @@ n_validate_trials = 2n_break_after
 
 n_repeat_example = 20
 
-
 ################################################################################
-# expeirment and trial definitions
+# experiment and trial definitions
 
 experiment = Experiment(
   columns = [
     :sid => sid,
-    :condition => "pilot",
+    :condition => "study1",
     :version => version,
     :separation => medium_str,
     :stimulus,:phase,:stimtrak
   ],
   data_dir=joinpath("..","data","csv"),
   skip=trial_skip,
-  extensions=[stimtrak(stimtrak_port),Cedrus()],
+  extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
+              @Cedrus()],
   moment_resolution=moment_resolution,
 )
 
@@ -67,7 +59,7 @@ function aba(step,tone_len,tone_SOA,aba_SOA,repeat)
   gap = silence(tone_SOA-tone_len)
   aba = attenuate([A;gap;B;gap;A],atten_dB)
   aba_ = [aba;silence(aba_SOA-duration(aba))]
-  reduce(vcat,repeated(aba_,repeat))
+  reduce(vcat,Iterators.repeated(aba_,repeat))
 end
 
 stimuli = Dict(:medium => aba(medium,tone_len,tone_SOA,aba_SOA,stimuli_per_response))
@@ -125,16 +117,12 @@ end
 # instructions and trial setup
 
 setup(experiment) do
-  addbreak(moment(250ms,play,@> tone(1000,1) ramp attenuate(atten_dB)))
-
-  instruction_image1 = load(joinpath("Images","navy_aba_01.png"))
-  instruction_image2 = load(joinpath("Images","navy_aba_02.png"))
-  instruction_image3 = load(joinpath("Images","navy_aba_03.png"))
+  addbreak(moment(250ms,play,@> tone(1kHz,1s) ramp attenuate(atten_dB)))
 
   example1 = aba(low,tone_len,tone_SOA,aba_SOA,n_repeat_example)
 
   addbreak(
-    moment(display,instruction_image1),
+    moment(display,joinpath("Images","navy_aba_01.png")),
     await_response(iskeydown(end_break_key)))
 
   @addtrials let play_example = true
@@ -148,15 +136,15 @@ setup(experiment) do
   end
 
   addbreak(
-    moment(display,instruction_image1),
+    moment(display,joinpath("Images","navy_aba_01.png")),
     await_response(iskeydown(end_break_key)),
-    moment(display,instruction_image2),
+    moment(display,joinpath("Images","navy_aba_02.png")),
     await_response(iskeydown(end_break_key)))
 
   example2 = aba(high,0.75tone_len,0.75tone_SOA,0.75aba_SOA,n_repeat_example)
 
   addbreak(
-    moment(display,instruction_image3),
+    moment(display,joinpath("Images","navy_aba_03.png")),
     await_response(iskeydown(end_break_key)))
   @addtrials let play_example = true
     @addtrials while play_example
@@ -184,8 +172,9 @@ setup(experiment) do
       """))
 
   addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=10trial_spacing),
-             num_practice_trials))
+    Iterators.repeated(practice_trial(:medium,phase="practice",
+                                      limit=10trial_spacing),
+                       num_practice_trials))
 
   addbreak(myinstruct("""
 
@@ -194,8 +183,9 @@ setup(experiment) do
     """))
 
   addpractice(
-    repeated(practice_trial(:medium,phase="practice",limit=2trial_spacing),
-             num_practice_trials))
+    Iterators.repeated(practice_trial(:medium,phase="practice",
+                                      limit=2trial_spacing),
+                       num_practice_trials))
 
   addbreak(myinstruct("""
 
@@ -227,8 +217,7 @@ setup(experiment) do
   """)
   addbreak(message,await_response(iskeydown(end_break_key)))
 
-  instruction_image4 = load(joinpath("Images","navy_aba_04.png"))
-  addbreak(moment(display,instruction_image4),
+  addbreak(moment(display,joinpath("Images","navy_aba_03.png")),
     await_response(iskeydown(end_break_key)))
 
   for trial in 1:n_validate_trials
