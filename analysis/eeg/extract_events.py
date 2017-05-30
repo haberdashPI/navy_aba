@@ -11,38 +11,42 @@ execfile("local_settings.py")
 execfile("src/astimed.py")
 execfile("src/findpeak.py")
 
-names = ["Jared_04_03_17",
-         "sandra_2017_03_31",
-         "Jacki_03_22_17",
-         "Beatriz_03_20_17",
-         "1103_2017_04_24",
-         "1102_2017_04_24",
-         "1101_4-21-17",
-         "1105_2017_04_26"]
-
 manual_offset = {
-  "Jared_04_03_17": 0,
-  "sandra_2017_03_31": 0,
-  "Jacki_03_22_17": 0,
-  "Beatriz_03_20_17": 0,
-  "1103_2017_04_24": -255,
-  "1102_2017_04_24": 0,
-  "1101_4-21-17": 0,
-  "1105_2017_04_26": 0,
+  "Jared": 0,
+  "sandra": 0,
+  "Jacki": 0,
+  "Beatriz": 0,
+  "anthony": 0,
+  "jessica": 0,
+  "1103": -255,
+  "1102": 0,
+  "1101": 0,
+  "1105": 0,
+  "1106": 0,
+  "1107": 0,
+  "1108": 0,
+  "1109": 0,
+  "1110": 0,
+  "1111": 0,
+  "1112": 0,
+  "1113": 0,
+  "1114": 0
 }
 
 codes = np.array([-2**12,-2**13,255+9,9,2**16])
 tolerances = np.array([300,300,5,5,1000])
 
-data_dir = op.realpath(op.join("..","..","data"))
-
-if not op.isdir(op.join(data_dir,"temp")):
-  os.mkdir(op.join(data_dir,"temp"))
-
 # TODO: skip already analyzed files
 
 for name in names:
-  raw = mne.io.read_raw_fif(op.join(temp_dir,name+".fif"),preload=True)
+  event_file = op.join(data_dir,"events",name+"_events.csv")
+  if op.isfile(event_file):
+    print event_file+" already generated, skipping..."
+    continue
+
+  raw = mne.io.read_raw_edf(op.join(data_dir,"bdf",name+".bdf"),preload=True,misc=['Erg1'],
+                            eog=['IO1','IO2','LO1','LO2'],
+                            montage=op.join(data_dir,'..','acnlbiosemi64.sfp'))
 
   # analyze STI channel
   stim_channel = [raw.info['ch_names'].index('STI 014')]
@@ -52,7 +56,7 @@ for name in names:
   ## (usually because there are too many stimulus triggers, and that becomes the
   ## median).
   raw_stim = raw.get_data(picks=stim_channel)
-  offset = np.median(raw_stim) + manual_offset[name]
+  offset = np.median(raw_stim) + manual_offset[name.split("_")[0]]
   raw_stim = (raw_stim - offset).astype('int_')
 
   near = np.abs(raw_stim - codes[:,np.newaxis]) < tolerances[:,np.newaxis]
@@ -70,7 +74,7 @@ for name in names:
   y = np.maximum(0,x)
 
   sample_rate = 512
-  b,a = butter(2,2.5 / (512.0/2), 'low')
+  b,a = butter(2,5 / (512.0/2), 'low')
   y = filtfilt(b,a,y)
 
   yd = np.hstack([[[0]],np.diff(y)])
@@ -86,4 +90,7 @@ for name in names:
   all_events = pd.concat([run_events,stim_events])
   all_events['sid'] = name.split("_")[0]
   all_events = all_events.sort_values('time')
-  all_events.to_csv(op.join(data_dir,"temp",name+"_events.csv"))
+  all_events.to_csv(event_file)
+
+  #
+  # FOR LAB: provide a way to add in events consistently after the start
