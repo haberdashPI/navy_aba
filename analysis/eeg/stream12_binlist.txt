@@ -1,0 +1,7 @@
+bin 1
+Stream 1 response
+.{110;111}
+
+bin 2
+Stream 2 response
+.{120;121}

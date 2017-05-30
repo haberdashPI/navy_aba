@@ -2,5 +2,6 @@
 \#*
 *~
 program/calibrate.jl
-*.bdf
+eeg_data/
 plots/
+binlist_test.txt

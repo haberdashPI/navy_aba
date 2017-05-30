@@ -5,7 +5,6 @@ import numpy as np
 import mne
 execfile("local_settings.py")
 
-data_dir = op.realpath(op.join("..","..","data"))
 bdf_dir = op.join(data_dir,"bdf")
 
 # the location for all intermediate processing stages
@@ -16,9 +15,10 @@ for name in names:
     print op.join(temp_dir,name+".fif")+" already generated, skipping..."
     continue
   print "Processing ",name
-  raw = mne.io.read_raw_edf(op.join(bdf_dir,name+".bdf"),preload=True,misc=['Erg1'],
+  raw = mne.io.read_raw_edf(op.join(bdf_dir,name+".bdf"),
+                            preload=True,misc=['Erg1'],
                             eog=['IO1','IO2','LO1','LO2'],
-                            montage=op.join(data_dir,'acnlbiosemi64.sfp'))
+                            montage=op.join(data_dir,'..','acnlbiosemi64.sfp'))
 
   raw.filter(0.01,30,l_trans_bandwidth='auto',
              h_trans_bandwidth='auto',
