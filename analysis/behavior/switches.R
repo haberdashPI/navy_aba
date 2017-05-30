@@ -2,7 +2,9 @@ require(ggplot2)
 require(tidyr)
 require(dplyr)
 
-dir = "../../data/temp"
+source("../eeg/local_settings.R")
+
+dir = file.path(data_dir,"events")
 data = Reduce(rbind,Map(read.csv,list.files(dir,pattern=".*csv$",full.name=T)))
 
 data = data %>%
@@ -32,12 +34,12 @@ ggplot(means,aes(x=aribtrary,y=100*p_noswitch)) +
                aes(group='mean',x=0.75),
                size=1.75,
                position=position_dodge(width=1)) +
-  xlim(-0.5,1) + theme_set(theme_classic(base_size = 22)) +
+  xlim(-0.5,1) + theme_classic(base_size = 22) +
   coord_cartesian(ylim=c(0,100)) +
   theme(axis.title.x=element_blank(),
         axis.text.x=element_blank(),
         axis.ticks.x=element_blank()) +
   xlab('') + ylab('% "no-switch" responses')
 
-ggsave(paste('../../plots/switching_',Sys.Date(),".pdf",sep=''),
-       width=3,height=5)
+ggsave(paste('../../plots/noswitch_',Sys.Date(),".pdf",sep=''),
+       width=3.5,height=4.5,useDingbats=F)
