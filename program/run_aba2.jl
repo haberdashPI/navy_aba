@@ -9,6 +9,7 @@ include("stimtrak.jl")
 version = v"0.0.1"
 sid,trial_skip,deviant = @read_args("ABA study",deviant=[:gap,:surprise_tone])
 
+randomize_by(sid + string(deviant))
 ################################################################################
 # settings
 
@@ -39,6 +40,7 @@ experiment = Experiment(
   columns = [
     :sid => sid,
     :condition => "study2",
+    :deviant => string(deviant),
     :version => version,
     :separation => medium_str,
     :stimulus,:stimtrak
@@ -71,9 +73,9 @@ function a_trial()
   stim = map(1:aba_per_trial) do i
     if i in deviant_indices
       if deviant == :gap
-        moment(aba_SOA)
+        [moment(aba_SOA),record("gap")]
       elseif deviant == :surprise_tone
-        moment(aba_SOA,play,mix(an_aba,surprise_tone))
+        [moment(aba_SOA,play,mix(an_aba,surprise_tone)),record("tone")]
       else
         error("Unexpected deviant type $deviant")
       end
