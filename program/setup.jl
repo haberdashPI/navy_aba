@@ -1,7 +1,4 @@
-Pkg.add("Weber")
-Pkg.and("WeberDAQmx")
-Pkg.add("WeberCedrus")
-Pkg.add("Lazy")
+Pkg.add("Weber",v"0.5.1")
 
 if !isfile("calibrate.jl")
   open("calibrate.jl","w") do s
@@ -11,15 +8,13 @@ if !isfile("calibrate.jl")
 
     # call Pkg.test(\"Weber\"). If the timing test fails, increase
     # moment resolution to avoid warnings.
-    const moment_resolution = Weber.default_moment_resolution
+    const moment_resolution = 1.5ms
 
-    const stream_1 = key"q"
-    const stream_2 = key"p"
+    const stream_1 = key":cedrus5:"
+    const stream_2 = key":cedrus6:"
     const end_break_key = key"`"
-    const oddball_key = key"q"
 
-    # select an appropriate serial port for stimtrak using
-    # SerailPorts.list_serialports() (after calling `using SerialPorts`)
+    # select an appropriate serial port for stimtrak
     const stimtrak_port = nothing
     """)
 
