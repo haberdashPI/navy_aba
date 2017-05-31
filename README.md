@@ -2,16 +2,19 @@
 
 This is a work-in-progress experiment looking at
 [auditory streaming](http://www.nature.com/nrn/journal/v14/n10/fig_tab/nrn3565_F3.html)
-with intermittent presentations, to allow for easier to interpret EEG data,
-motivated by the following work:
+with intermittent presentations, ala
+[Pitts & Britz (2011)](https://doi.org/10.3389/fnhum.2011.00107).
 
-Pitts, M. A., & Britz, J. (2011). Insights from Intermittent Binocular Rivalry and EEG. Frontiers in Human Neuroscience, 5. https://doi.org/10.3389/fnhum.2011.00107
+# Contents
+
+* [Running the experiment](running-the-experiment)
+* [Data analysis](data-analysis)
 
 # Running the experiment
 
-You need to install julia, and then run the setup.jl script.
+You need to install julia, run the setup.jl script, and then run the appropriate study.
 
-One way to do this is as follows:
+To install the expeirment:
 
 1. [Download](https://github.com/haberdashPI/navy_wordstream/archive/master.zip)
    and unzip this project.
@@ -20,16 +23,18 @@ One way to do this is as follows:
 4. Run setup.jl in Juno (e.g. Julia > Run File).
 5. call `using Weber` to verify the installation (you may need to restart Julia).
 
-If you installed Juno (see above) just run `run_aba.jl` in Juno.  Make
-sure you have the console open (Julia > Open Console), as you will be prompted
-to enter a number of experimental parameters. Also note that important warnings
-and information about the experiment will be written to the console.
+To run the experiment:
 
-Alternatively, if you have julia setup in your `PATH`, you can run the
-experiment from a terminal by typing `julia run_aba.jl`. On mac (or unix)
-this can be shortened to `./run_aba.jl`. You can get help about how to
-use the console verison by typing `julia run_aba.jl -h` (or `./run_aba.jl` on
-mac or unix).
+1. Open Juno
+2. Open the console (Julia > Open Console)
+3. Change the working directory to the `program` folder - to do this open a file
+in that folder, then go to the menu itme Julia > Working Directory > Current
+File's Folder.
+3. To run the first study type `include("run_aba.jl")` and hit enter.
+
+Replace `run_aba.jl` with whatever study you want to actually run. All study files
+are prefixed with `run_`. Any other Julia files are referenced somewhere in the
+study files.
 
 ## Restarting the experiment
 
@@ -38,13 +43,68 @@ number. This number is also saved on each line of the data recorded during
 the experiment. You can use this number to call `run_aba.jl` starting from
 somewhere in the middle of the experiment.
 
-# Analyzing the data
+# Data analysis
 
-Analysis uses [R](https://www.r-project.org/) and
-[anaconda](https://www.continuum.io/downloads) python. All analyses are located
-in the anlaysis folder. 
+To re-run the analyses, you will need:
 
-## BDFs
+* [R](https://www.r-project.org/)
+* [RStudio](https://www.rstudio.com/)
+* [anaconda (pythong 2.7)](https://www.continuum.io/downloads)
+* [Matlab](https://www.mathworks.com/)
+* [eeglab](https://sccn.ucsd.edu/eeglab/)
 
-The raw BDFs for eeg data are not stored directly in the git repository, as they are quite
-large. 
+Install all of these programs before proceeding. 
+
+Before running the analysis, you must first place all of the raw BDFs (which are
+not part of the git repository) in a folder named `eeg_data`, located directly
+under the base folder (`navy_aba`).
+
+## Power Analysis
+
+A simple power analysis using [Davidson and Pitts (2014)](**TODO**) can be found
+in `analysis/eeg/power`. When running this code in R, the `pwr.t.test` calls
+will report the estaimtes for N. This file also includes a work-in-progress
+desing anlaysis based on the methods described in [Gelman and Carlin (2014)](**TODO**). 
+
+## Analysis of EEG
+
+### Extrating events from the raw EEG files
+
+The first step for eeg anlaysis is extracting the events from the bdfs. This
+process will create an event file that can be loaded in BESA research, and
+another that can be loaded in eeglab. This can
+be done as follows:
+
+1. Open Spyder - this should be installed with anaconda.
+2. Open `analysis/eeg/extract_events.py`
+3. Set the current working directory of python to be `anlaysis/eeg` - you can do
+   this by right clicking the tab for `extract_events.py` and selecting the
+   appropriate command.
+4. Run `analysis/eeg/extract_events.py`
+5. Open RStudio
+6. Open `analysis/eeg/clean_events.R`
+7. Set the current working directory of R to be `analysis/eeg` - you can do this
+   by **TODO**.
+8. Set the current 
+
+From this point, once you hvae extracted events there are two working approaches
+for extracting ERPs.
+
+### finding ERPs in BESA
+
+**TODO**: move the various BESA batch files and paradigm files into this folder,
+and re-run anlayses to verify this process works.
+
+### finding ERPs in eeglab
+
+**TODO**: finish up this pipeline, verify it, and write up the directions here.
+
+## Analysis of Behavior
+
+Each files under `analysis/behavior` generates several different plots (written
+to the `plots` folder). Before running these, you must extra
+[events from the eeg files](extracting-events-fromthe-raw-eeg-files). Once
+you've extracted events you can open any of the behavioral anlaysis files in R
+and run them (from the `analysis/behavior`) to re-generate graphs (or add new
+participants after collecting further data). Each file contains a description of
+the graphs it produces **TODO**.
