@@ -1,7 +1,7 @@
 import numpy as np
 from numba import jit, float64, void, int64
 
-@jit(int64(int64[:],int64[:],int64[:]))
+@jit(nopython=True)
 def __astimed(xs,ys,ts):
   ys[0] = xs[0]
   ts[0] = 0

@@ -1,9 +1,9 @@
 require(tidyr)
 require(dplyr)
 require(ggplot2)
-source('local_settings.R')
+source('../local_settings.R')
 
-event_data_dir = file.path(data_dir,"events")
+event_data_dir = file.path(data_dir,"events/")
 data = Reduce(rbind,Map(read.csv,list.files(event_data_dir,pattern='.*_events.csv',full.name=T)))
 
 stim_starts = data %>%
@@ -32,9 +32,9 @@ stream12 = trials %>%
   filter(event %in% c('stimulus','button1','button2'),block < 9) %>%
   mutate(event = as.character(event)) %>%
   summarize(
-    time = ifelse(all(event != 'stimulus'),first(time),
-                  first(time[event == 'stimulus'])),
-    response = last(event[event != 'stimulus'])) %>%
+    time = ifelse(all(event != 'stimulus'),head(time,1),
+                  head(time[event == 'stimulus'],1))[1],
+    response = tail(event[event != 'stimulus'],1)[1]) %>%
   mutate(isswitch = is.na(lag(response)) | response != lag(response),
          response = factor(response))
 
@@ -43,13 +43,13 @@ switches = trials %>%
   filter(event %in% c('stimulus','button1','button2'),block > 9) %>%
   mutate(event = as.character(event)) %>%
   summarize(
-    time = ifelse(all(event != 'stimulus'),first(time),
-                  first(time[event == 'stimulus'])),
-    response = last(event[event != 'stimulus'])) %>%
+    time = ifelse(all(event != 'stimulus'),head(time,1),
+                  head(time[event == 'stimulus'],1))[1],
+    response = tail(event[event != 'stimulus'],1)[1]) %>%
   mutate(response = factor(response))
 
-ggplot(stream12,aes(y=sid,x=trial,color=response)) + geom_point()
-ggplot(switches,aes(y=sid,x=trial,color=response)) + geom_point()
+#ggplot(stream12,aes(y=sid,x=trial,color=response)) + geom_point()
+#ggplot(switches,aes(y=sid,x=trial,color=response)) + geom_point()
 
 besa_events = stream12 %>%
   mutate(Tmu = as.integer(round(time*10**6)),

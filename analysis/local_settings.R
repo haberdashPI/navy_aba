@@ -1,5 +1,9 @@
-temp_dir = '/Volumes/Miguel/Research/fifs'
-data_dir = "/Volumes/MiguelJr/Research/Data/navy_aba/study1"
+temp_dir = '../../eeg_data/temp'
+data_dir = "../../eeg_data/study1"
+
+# NOTE: the participants are not excluded from the R version of local settings
+# because it is used during behavioral anlayses (and we want to look at the data from participants with 
+# too few switches)
 
 names = c(
   "Jared_04_03_17",

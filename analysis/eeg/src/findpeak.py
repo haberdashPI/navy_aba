@@ -4,7 +4,7 @@ from warnings import warn
 # out above the other values
 
 from numba import jit, void, float64, int64
-@jit(void(float64[:],float64,int64,int64[:]))
+@jit(nopython=True)
 def findpeaks__(xs,t,window,peak_indices):
   peakstart = -1
   peak_count = 0

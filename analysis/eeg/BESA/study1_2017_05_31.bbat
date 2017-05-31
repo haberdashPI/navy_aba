@@ -1,0 +1,7 @@
+ArtifactAutoCorrect(EOG,150.0,250.0,noEKG,74,74,100.0)
+MAINFilter(LC:0.01-12dB-z,HC:30.00-24dB-z,NF:off,BP:off)
+MAINMontage(Original Average Reference, Wait if invalid, GlobalMontage)
+MAINEventRead(%basename%_clean_events.evt)
+MAINParadigm(C:\Users\ACNLab\Documents\navy_aba\analysis\eeg\BESA\study1_2017_04_27.PDG)
+MAINArtifactScan(NoWait)
+MAINAverage( , ,DefaultName,OverwriteTarget, Correct,TimeAverage)

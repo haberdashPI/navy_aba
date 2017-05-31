@@ -1,10 +1,5 @@
-# settings specific to a particular machine
-
-# specify a place to store all intermediate eeg data files (these are large)
-# this is used for files that can be recalculated at any time, but they may take
-# a while to calculate, so it's easier to store the results in files
-temp_dir = "/Volumes/Miguel/Research/fifs"
-data_dir = "/Volumes/MiguelJr/Research/Data/navy_aba/study1/"
+temp_dir = "../../eeg_data/temp"
+data_dir = "../../eeg_data/study1"
 
 names = [
   "Jared_04_03_17",
@@ -14,9 +9,10 @@ names = [
   "1103_2017_04_24",
   "1102_2017_04_24",
   "1101_4-21-17",
+  #1104 - no swithes + data lost
   #"1105_2017_04_26", # only 18 switches
   "1106_5-1-17",
-  #"1107_5-2-2017", # no switches?
+  #"1107_5-2-2017", # no switches
   "anthony_04_18_17",
   "jessica_2017_04_07",
   "1108_05_03_2017",

@@ -7,7 +7,7 @@ import mne
 
 from scipy.signal import butter, filtfilt
 
-execfile("local_settings.py")
+execfile("../local_settings.py")
 execfile("src/astimed.py")
 execfile("src/findpeak.py")
 
@@ -45,8 +45,7 @@ for name in names:
     continue
 
   raw = mne.io.read_raw_edf(op.join(data_dir,"bdf",name+".bdf"),preload=True,misc=['Erg1'],
-                            eog=['IO1','IO2','LO1','LO2'],
-                            montage=op.join(data_dir,'..','acnlbiosemi64.sfp'))
+                            eog=['IO1','IO2','LO1','LO2'])
 
   # analyze STI channel
   stim_channel = [raw.info['ch_names'].index('STI 014')]
@@ -88,7 +87,7 @@ for name in names:
   #   plt.axvline(x=i,color='red')
 
   all_events = pd.concat([run_events,stim_events])
-  all_events['sid'] = name.split("_")[0]
+  all_events['sid'] = name
   all_events = all_events.sort_values('time')
   all_events.to_csv(event_file)
 

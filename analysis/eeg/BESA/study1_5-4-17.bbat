@@ -1,0 +1,6 @@
+ArtifactAutoCorrect(EOG,150.0,250.0,noEKG,74,74,100.0)
+MAINFilter(LC:0.01-12dB-z,HC:30.00-24dB-z,NF:off,BP:off)
+MAINMontage(Erins Mastoid Reference, Wait if invalid, GlobalMontage)
+MAINParadigm(C:\Users\ACNLab\Desktop\navy_aba\data\NAVY_aba_paradigm.PDG)
+MAINArtifactScan(NoWait)
+MAINAverage( , ,DefaultName,OverwriteTarget, Correct,TimeAverage)
