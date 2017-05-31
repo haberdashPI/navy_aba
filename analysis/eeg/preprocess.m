@@ -95,19 +95,13 @@ end
 %% MANUAL STEP
 % Before running the next block, each set of ica components must be examined.
 %
-% Open eeglab and load a file with suffix '_stream12_ica.set'. Run ADJUST, and
-% reject any components ADJUST rejects that don't look like they have any
-% signal in them (i.e. a flat specturm). Real artificats should be distributed
-% throughout the channels and time.  Also make sure that there aren't any
-% obvious artifacts that ADJUST missed in the first few components.  Once the
-% components have been selected for rejection, reject them and verify that they
-% worked by comparing the old and new raw data to make sure artifacts were
-% removed and no weird noise was introduced by component rejection.
+% Open eeglab and load a file with suffix '_stream12_ica.set'. Open the
+% interface for removing ICA components by map, and reject artifactula
+% components: record the components (and any notes) to the google spreadsheet
+% Navy ABA - Study 1 - Rejected Components.
 
 % Save the resulting eeg to a new file in the same directory with the suffix
 % '_stream12_ica_rej.set'
-% Then, reject the same components for the file with suffix '_switching_ica.set'
-% and then re-verify the raw data for this version.
 
 %% ----------------------------------------------------------------------------
 %% epoching/averaging
