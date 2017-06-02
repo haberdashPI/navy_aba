@@ -1,0 +1,27 @@
+Library "ImageMagick" is not installed but is recommended as a library to load format: ".png"
+.png".
+Fatal error:
+ERROR: LoadError: ImageMagick is not installed.
+
+Stacktrace:
+ [1] checked_import(::Symbol) at C:\.julia\v0.6\FileIO\src\loadsave.jl:12
+ [2] #load#17(::Array{Any,1}, ::Function, ::FileIO.File{FileIO.DataFormat{:PNG}}) at C:\.julia\v0.6\FileIO\src\loadsave.jl:83
+ [3] load(::FileIO.File{FileIO.DataFormat{:PNG}}) at C:\.julia\v0.6\FileIO\src\loadsave.jl:75
+ [4] #load#13(::Array{Any,1}, ::Function, ::String) at C:\.julia\v0.6\FileIO\src\loadsave.jl:45
+ [5] (::Weber.##32#33{Array{Any,1},Weber.SDLWindow,String})() at C:\.julia\v0.6\Weber\src\video.jl:450
+ [6] get!(::Weber.##32#33{Array{Any,1},Weber.SDLWindow,String}, ::LRUCache.LRU{UInt64,Weber.SDLImage}, ::UInt64) at C:\.julia\v0.6\LRUCache\src\LRUCache.jl:48
+ [7] image_cache at C:\.julia\v0.6\Weber\src\video.jl:547 [inlined]
+ [8] #visual#31(::Array{Any,1}, ::Function, ::Weber.SDLWindow, ::String, ::Bool) at C:\.julia\v0.6\Weber\src\video.jl:449
+ [9] visual(::Weber.SDLWindow, ::String) at C:\.julia\v0.6\Weber\src\video.jl:448
+ [10] #visual#25(::Array{Any,1}, ::Function, ::String) at C:\.julia\v0.6\Weber\src\video.jl:276
+ [11] #moment#235(::Array{Any,1}, ::Function, ::Quantity{Float64, Dimensions:{𝐓}, Units:{s}}, ::Base.Multimedia.#display, ::String) at C:\.julia\v0.6\Weber\src\trial.jl:381
+ [12] moment(::Quantity{Float64, Dimensions:{𝐓}, Units:{s}}, ::Base.Multimedia.#display, ::String) at C:\.julia\v0.6\Weber\src\trial.jl:381
+ [13] #moment#232(::Array{Any,1}, ::Function, ::Function, ::String, ::Vararg{String,N} where N) at C:\.julia\v0.6\Weber\src\trial.jl:363
+ [14] (::##8#21)() at C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl:124
+ [15] setup(::##8#21, ::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}) at C:\.julia\v0.6\Weber\src\experiment.jl:246
+ [16] setup(::Function, ::Weber.ExtendedExperiment{WeberCedrus.Cedrus,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},1,Weber.SDLWindow}) at C:\.julia\v0.6\Weber\src\experiment.jl:240 (repeats 2 times)
+ [17] include_from_node1(::String) at .\loading.jl:569
+ [18] include(::String) at .\sysimg.jl:14
+ [19] process_options(::Base.JLOptions) at .\client.jl:305
+ [20] _start() at .\client.jl:371
+while loading C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl, in expression starting on line 119

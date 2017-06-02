@@ -6,9 +6,9 @@ using Weber
 include("calibrate.jl")
 include("stimtrak.jl")
 
-version = v"0.2.1"
+version = v"0.3.1"
 sid,trial_skip =
-  @read_args("Runs an intermittant aba experiment, version $version.")
+  @read_args("Runs an intermittant aba ``experiment, version $version.")
 
 ################################################################################
 # settings
@@ -196,7 +196,7 @@ setup(experiment) do
   addbreak(anykey,await_response(iskeydown))
 
   total_breaks = div(n_trials,n_break_after) +
-    div(n_validate_trials,n_break_after)
+    div(n_validate_trials,n_break_after) - 1
 
   for trial in 1:n_trials
     if trial == 1
@@ -219,6 +219,9 @@ setup(experiment) do
 
   addbreak(moment(display,joinpath("Images","navy_aba_03.png")),
     await_response(iskeydown(end_break_key)))
+
+  addbreak(moment(display,"Wait for the experiment to press continue..."),
+           await_response(iskeydown(end_break_key)))
 
   for trial in 1:n_validate_trials
     if trial > 1 && trial % n_break_after == 1

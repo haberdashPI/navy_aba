@@ -1,0 +1,65 @@
+Hit enter to end experiment.
+e === instead.
+Stacktrace:
+ [1] depwarn(::String, ::Symbol) at .\deprecated.jl:64
+ [2] is(::LRUCache.LRUNode{Tuple{String,UInt32,Weber.SDLFont},Weber.SDLText}, ::Vararg{LRUCache.LRUNode{Tuple{String,UInt32,Weber.SDLFont},Weber.SDLText},N} where N) at .\deprecated.jl:31
+ [3] move_to_front!(::LRUCache.LRUList{Tuple{String,UInt32,Weber.SDLFont},Weber.SDLText}, ::LRUCache.LRUNode{Tuple{String,UInt32,Weber.SDLFont},Weber.SDLText}) at C:\.julia\v0.6\LRUCache\src\list.jl:103
+ [4] getindex(::LRUCache.LRU{Tuple{String,UInt32,Weber.SDLFont},Weber.SDLText}, ::Tuple{String,UInt32,Weber.SDLFont}) at C:\.julia\v0.6\LRUCache\src\LRUCache.jl:65
+ [5] get!(::Weber.##38#40{Weber.SDLWindow,Int64,Int64,Weber.SDLFont,ColorTypes.RGB{FixedPointNumbers.Normed{UInt8,8}},UInt32,String,Quantity{Int64, Dimensions:{𝐓}, Units:{s}},Int64}, ::LRUCache.LRU{Tuple{String,UInt32,Weber.SDLFont},Weber.SDLText}, ::Tuple{String,UInt32,Weber.SDLFont}) at C:\.julia\v0.6\LRUCache\src\LRUCache.jl:46
+ [6] #visual#37(::ColorTypes.RGB{FixedPointNumbers.Normed{UInt8,8}}, ::Float64, ::Bool, ::Int64, ::Int64, ::Quantity{Int64, Dimensions:{𝐓}, Units:{s}}, ::Int64, ::Function, ::Weber.SDLWindow, ::String, ::Weber.SDLFont) at C:\.julia\v0.6\Weber\src\video.jl:481
+ [7] visual(::Weber.SDLWindow, ::String, ::Weber.SDLFont) at C:\.julia\v0.6\Weber\src\video.jl:477
+ [8] #visual_text#34(::Void, ::String, ::Int64, ::Array{Any,1}, ::Function, ::Weber.SDLWindow, ::String) at C:\.julia\v0.6\Weber\src\video.jl:463
+ [9] #visual#31(::Array{Any,1}, ::Function, ::Weber.SDLWindow, ::String, ::Bool) at C:\.julia\v0.6\Weber\src\video.jl:453
+ [10] visual(::Weber.SDLWindow, ::String) at C:\.julia\v0.6\Weber\src\video.jl:448
+ [11] #visual#25(::Array{Any,1}, ::Function, ::String) at C:\.julia\v0.6\Weber\src\video.jl:276
+ [12] #moment#235(::Array{Any,1}, ::Function, ::Quantity{Int64, Dimensions:{𝐓}, Units:{s}}, ::Base.Multimedia.#display, ::String) at C:\.julia\v0.6\Weber\src\trial.jl:381
+ [13] #show_cross#297 at C:\.julia\v0.6\Weber\src\primitives.jl:135 [inlined]
+ [14] show_cross(::Quantity{Int64, Dimensions:{𝐓}, Units:{s}}) at C:\.julia\v0.6\Weber\src\primitives.jl:135
+ [15] macro expansion at C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl:151 [inlined]
+ [16] (::##16#29{Weber.Sound{44100,Float64,1}})() at C:\.julia\v0.6\Weber\src\trial.jl:269
+ [17] #trial_block#218(::Bool, ::Function, ::Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}, ::##16#29{Weber.Sound{44100,Float64,1}}, ::Function) at C:\.julia\v0.6\Weber\src\trial.jl:284
+ [18] (::Weber.#kw##trial_block)(::Array{Any,1}, ::Weber.#trial_block, ::Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}, ::Function, ::Function) at .\<missing>:0
+ [19] #trial_block#217(::Array{Any,1}, ::Function, ::Function, ::Function) at C:\.julia\v0.6\Weber\src\trial.jl:278
+ [20] (::Weber.#kw##trial_block)(::Array{Any,1}, ::Weber.#trial_block, ::Function, ::Function) at .\<missing>:0
+ [21] macro expansion at C:\.julia\v0.6\Weber\src\trial.jl:268 [inlined]
+ [22] macro expansion at C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl:150 [inlined]
+ [23] (::##15#28{Weber.Sound{44100,Float64,1}})() at C:\.julia\v0.6\Weber\src\trial.jl:218
+ [24] #trial_block#218(::Bool, ::Function, ::Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}, ::##15#28{Weber.Sound{44100,Float64,1}}, ::Function) at C:\.julia\v0.6\Weber\src\trial.jl:284
+ [25] #trial_block#217(::Array{Any,1}, ::Function, ::Function, ::Function) at C:\.julia\v0.6\Weber\src\trial.jl:278
+ [26] macro expansion at C:\.julia\v0.6\Weber\src\trial.jl:217 [inlined]
+ [27] (::##8#21)() at C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl:149
+ [28] setup(::##8#21, ::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}) at C:\.julia\v0.6\Weber\src\experiment.jl:246
+ [29] setup(::Function, ::Weber.ExtendedExperiment{WeberCedrus.Cedrus,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},1,Weber.SDLWindow}) at C:\.julia\v0.6\Weber\src\experiment.jl:240 (repeats 2 times)
+ [30] include_from_node1(::String) at .\loading.jl:569
+ [31] include(::String) at .\sysimg.jl:14
+ [32] process_options(::Base.JLOptions) at .\client.jl:305
+ [33] _start() at .\client.jl:371
+while loading C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl, in expression starting on line 119
+WARNING: is is deprecated, use === instead.
+Stacktrace:
+ [1] depwarn(::String, ::Symbol) at .\deprecated.jl:64
+ [2] is(::LRUCache.LRUNode{UInt64,Weber.Sound}, ::Vararg{LRUCache.LRUNode{UInt64,Weber.Sound},N} where N) at .\deprecated.jl:31
+ [3] move_to_front!(::LRUCache.LRUList{UInt64,Weber.Sound}, ::LRUCache.LRUNode{UInt64,Weber.Sound}) at C:\.julia\v0.6\LRUCache\src\list.jl:103
+ [4] setindex!(::LRUCache.LRU{UInt64,Weber.Sound}, ::Weber.Sound{44100,FixedPointNumbers.Fixed{Int16,15},2}, ::UInt64) at C:\.julia\v0.6\LRUCache\src\LRUCache.jl:73
+ [5] register_sound at C:\.julia\v0.6\Weber\src\playback.jl:56 [inlined]
+ [6] register_sound at C:\.julia\v0.6\Weber\src\playback.jl:55 [inlined]
+ [7] play_(::Weber.Sound{44100,FixedPointNumbers.Fixed{Int16,15},2}, ::Float64, ::Int64) at C:\.julia\v0.6\Weber\src\playback.jl:254
+ [8] run(::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}, ::Weber.MomentQueue, ::Weber.PlayMoment) at C:\.julia\v0.6\Weber\src\trial.jl:552
+ [9] foreach(::Weber.##251#252{Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}},Weber.MomentQueue}, ::Array{Weber.AbstractMoment,1}) at .\abstractarray.jl:1724
+ [10] handle(::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}, ::Weber.MomentQueue, ::Weber.MomentSequence, ::Float64) at C:\.julia\v0.6\Weber\src\trial.jl:597
+ [11] process(::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}, ::Weber.MomentQueue, ::Float64) at C:\.julia\v0.6\Weber\src\experiment.jl:541
+ [12] #280 at C:\.julia\v0.6\Weber\src\experiment.jl:477 [inlined]
+ [13] filter!(::Weber.##280#281{Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}},Float64}, ::Array{Weber.MomentQueue,1}) at .\array.jl:1817
+ [14] #run#277(::Bool, ::Function, ::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}) at C:\.julia\v0.6\Weber\src\experiment.jl:395
+ [15] run(::Weber.BaseExtendedExperiment{Weber.SDLWindow,Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}}) at C:\.julia\v0.6\Weber\src\experiment.jl:360
+ [16] #run#276(::Array{Any,1}, ::Function, ::Weber.ExtendedExperiment{WeberCedrus.Cedrus,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},1,Weber.SDLWindow}) at C:\.julia\v0.6\Weber\src\experiment.jl:356
+ [17] run(::Weber.ExtendedExperiment{WeberCedrus.Cedrus,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},1,Weber.SDLWindow}) at C:\.julia\v0.6\Weber\src\experiment.jl:356
+ [18] #run#276(::Array{Any,1}, ::Function, ::Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}) at C:\.julia\v0.6\Weber\src\experiment.jl:356
+ [19] run(::Weber.ExtendedExperiment{WeberDAQmx.EmptyDAQmx,Tuple{WeberCedrus.Cedrus,WeberDAQmx.EmptyDAQmx},2,Weber.SDLWindow}) at C:\.julia\v0.6\Weber\src\experiment.jl:356
+ [20] include_from_node1(::String) at .\loading.jl:569
+ [21] include(::String) at .\sysimg.jl:14
+ [22] process_options(::Base.JLOptions) at .\client.jl:305
+ [23] _start() at .\client.jl:371
+while loading C:\Users\ACNLab\Documents\navy_aba\program\run_aba.jl, in expression starting on line 236
+INFO: Experiment terminated at offset 9.
+INFO: Data recorded to: C:\Users\ACNLab\Documents\navy_aba\data\csv\test_study1_0.2.1_6st_2017-06-02__09_58_25.csv
