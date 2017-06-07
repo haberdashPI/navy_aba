@@ -15,9 +15,19 @@ The first study uses the `program/run_aba.jl` script.
 
 Notes on participants:
 
+Jacki & Beatriz both had a now defuct block of oddball trials at the end
+of the rest of the experiment.
+
 **BEFORE 1101** Several RAs were more informally tested on the study, and
 their files are listed by name. This version of the study turned into the final
 version, and so there data is currently included in analyses.
+
+* Jessica - ICA reveals large artifacts on right frontal electrodes /...
+  and she only got sleep for one hour the previous night ... Alpha
+* 1104 - had a weave on and not sure if understood instructions properly and
+  only reported 1 stream
+* 1105 - clearly understood instructions but only reported 18 switches
+* 1107 - they only responded 1 stream
 
 **1104 Onwards** We had growing concerns about the instructions and examples
 we were using. At this point we revised the examples to make the "splitting"
@@ -25,13 +35,6 @@ example split more readily, and this seems to have addressed the many confused,
 skeptical and/or uncertain looks we were getting from participants. This
 also seems to have reduced the number of participants who respond with
 stream-1 resposnes only.
-
-* 1104 - had a weave on and not sure if understood instructions properly and
-  only reported 1 stream
-* 1105 - clearly understood instructions but only reported 18 switches
-* Jessica - ICA reveals large artifacts on right frontal electrodes /...
-  and she only got sleep for one hour the previous night ... Alpha
-* 1107 - they only responded 1 stream
 
 **BEFORE 1108** - no participants before this were run on the qualtrics survey,
 just the initial screener, becuase it took us up to the 2 hour mark to finish
