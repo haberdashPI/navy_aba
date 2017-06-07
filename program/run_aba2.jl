@@ -9,7 +9,7 @@ include("stimtrak.jl")
 version = v"0.1.0"
 sid,trial_skip,deviant = @read_args("ABA study",deviant=[:ripple,:flash])
 
-randomize_by(sid + string(deviant))
+randomize_by(sid * string(deviant))
 
 experiment = Experiment(
   columns = [
@@ -17,7 +17,6 @@ experiment = Experiment(
     :condition => "study2",
     :deviant => string(deviant),
     :version => version,
-    :separation => medium_str,
     :stimulus,:stimtrak
   ],
   data_dir=joinpath("..","data","csv"),
