@@ -65,7 +65,7 @@ D[3] = 0.99
 
 # TODO:
 
-## this function is from:
+## the following function is from:
 
 # Gelman, A., & Carlin, J. (2014). Beyond Power Calculations Assessing Type S
 # (Sign) and Type M (Magnitude) Errors. Perspectives on Psychological Science,
