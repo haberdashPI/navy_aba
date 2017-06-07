@@ -2,7 +2,7 @@ require(ggplot2)
 require(tidyr)
 require(dplyr)
 
-source("../eeg/local_settings.R")
+source("../local_settings.R")
 
 dir = file.path(data_dir,"events")
 data = Reduce(rbind,Map(read.csv,list.files(dir,pattern=".*csv$",full.name=T)))

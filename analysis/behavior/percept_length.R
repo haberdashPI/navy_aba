@@ -4,6 +4,19 @@ require(dplyr)
 
 source("../eeg/local_settings.R")
 
+## DESCRIPTION
+##
+## This generates a set of graphs that resemble those from
+## Figure 1 of Pressnitzer & Hupe 2006. Specifically:
+##
+## phase = a period during which a single response is given (e.g. stream1)
+##
+## pannel A - the proportion of streaming responses in the first 7
+##            phases.
+## panel B - histogram of log-normalized duration of all phases but the first
+## panel C - log-normalized duration of phase N vs. phase N-1 for all but the
+##           first phase.
+
 dir = file.path(data_dir,"events")
 data = Reduce(rbind,Map(read.csv,list.files(dir,pattern=".*csv$",full.name=T)))
 

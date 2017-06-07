@@ -1,3 +1,4 @@
+# helper function for old script (plot.stim.times.david.R)
 trial_to_times = function(trial,max_seconds=NA,
                           times=seq(0,max_seconds,length.out=100)){
 

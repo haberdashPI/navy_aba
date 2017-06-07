@@ -4,6 +4,12 @@ require(dplyr)
 
 source("../eeg/local_settings.R")
 
+## DESCRIPTION:
+##
+## This creates a graph of the mean proportion of stream1 vs
+## stream2 responses and the proportion of switching vs. non-switching
+## responess.
+
 dir = file.path(data_dir,"events")
 strip.name = function(str){
   name = strsplit(str,"/")[[1]]

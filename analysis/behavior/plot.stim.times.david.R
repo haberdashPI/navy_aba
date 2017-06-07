@@ -3,6 +3,14 @@ library(ggplot2)
 library(dplyr)
 source('trial_to_times.R')
 
+## DESCRIPTION
+##
+## This is an older graph used during piloting to compare continuous
+## vs. intermittent paradigms. It's a histogram of phase length (though that
+## terminology isn't used below), where a phase is the period of time where the
+## same percept is reported (so a new phase begins when the listeners change
+## what response they provide).
+
 file_pat = 'david_pilot_.*_6st_2017.*.csv'
 data_dir = '../../data/csv'
 results = Reduce(rbind,Map(read.csv,list.files(data_dir,file_pat,full.names=T)))
