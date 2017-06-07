@@ -7,9 +7,9 @@ with intermittent presentations, ala
 
 # Contents
 
-* [Guide](guide)
-* [Running the experiment](running-the-experiment)
-* [Data analysis](data-analysis)
+* [Guide](#guide)
+* [Running the experiment](#running-the-experiment)
+* [Data analysis](#data-analysis)
 
 # Guide
 
@@ -24,16 +24,16 @@ located.
 
 This project is organized and managed using [git](https://git-scm.com/),
 for verison control. Version control allows you to mark changes
-as you make them to files, with notes that describe what you changed and why
-and then permits you to peruse this history and retrieve previosuly
+as you make them to files, with notes that describe what you changed and why.
+You can then peruse this history and retrieve previosuly
 saved versions of any file.  
 
-All of the EEG data should be excluded from
-this version control (because the files are so large), and should be
+All of the EEG data, and files derrived thereof should be excluded from
+version control (because the files are so large), and should be
 stored under `eeg_data`. Any instructions for recreating the processed
-eeg files are contained in this README.md, so the only thing necessary
-to retrieve a given version of the eeg analysis should be the raw
-BDF files (see the [data analysis](data-analysis) section for details).
+eeg files are contained in this README.md, so to retriev a specific version
+of the EEG analysis, one need only follow the directions below
+(under [data anlaysis](#data-analysis)).
 
 # Running the experiment
 
@@ -113,9 +113,9 @@ In the ACNLab, these files are located on both CUMIN (under
 `C:\Users\ACNLab\Documents\navy_aba\eeg_data`) and on PEPPER
 (under `C:\Users\ACNLab\Desktop\EEG Data - Shortcut\NAVY_aba`).
 
-> The existing anlayses assume you are analyzing study1
+> The existing anlayses assume you are analyzing `study1`.
 > You will need to make changes to `local_settings.py` and `local_settings.R`
-> and replace any other references to study1 with the name of your followup
+> and replace any other references to `study1` with the name of your followup
 > study.
 
 ## Power Analysis
@@ -129,7 +129,7 @@ a work-in-progress design anlaysis based on the methods described in
 
 ## Analysis of EEG
 
-### Extrating events from the raw EEG files
+### Extracting events from the raw EEG files
 
 The first step for eeg anlaysis is extracting the events from the bdfs. This
 process will create an event file that can be loaded in BESA research, and
@@ -180,6 +180,14 @@ To find a grand average ERP:
 ### Finding ERPs in eeglab
 
 **TODO**: finish up this pipeline, verify it, and write up the directions here.
+
+### Finding ERPs with python MNE
+
+There is an incomplete, unworking analysis of the EEG data in
+[python-mne](https://martinos.org/mne/stable/index.html)
+under `anlaysis/eeg/old`. What remains to get this working is better rejection
+of artifacts. This should be possible following a procedure similar to that
+described for eeglab. Good luck!
 
 ## Analysis of Behavior
 
