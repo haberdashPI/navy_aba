@@ -14,12 +14,11 @@ latencies = data %>%
   mutate(latency = lead(time) - time) %>%
   filter(event =='stimulus' & lead(event) == 'trial_start')
 
-
 buttons = filter(data,event %in% c("button1","button2"))
 blocks = data %>%
-  filter(!(event == "block_start" & lag(event) == "off" &
-           lag(event,2) == "block_start")) %>%
-  filter(event == 'block_start')
+  group_by(sid) %>%
+  filter(event == 'block_start') %>%
+  filter(time - lag(time) > 0.5*2.8*75 | is.na(lag(time)))
 
 trials = rbind(stim_starts,buttons,blocks) %>%
   group_by(sid) %>%
@@ -74,5 +73,8 @@ for(mysid in unique(besa_events$sid)){
     select(Latency,Type)
   write.table(sdata,
                paste(event_data_dir,"/",mysid,'_clean_events.txt',sep=''),
-               row.names=F,sep='\t',quote=F)
+              row.names=F,sep='\t',quote=F)
+
+  sdata = subset(stream12,sid == mysid) %>% data.frame()
+  write.csv(sdata,paste(event_data_dir,"/",mysid,"_events_final.csv",sep=''))
 }
