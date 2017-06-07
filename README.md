@@ -26,13 +26,13 @@ This project is organized and managed using [git](https://git-scm.com/),
 for verison control. Version control allows you to mark changes
 as you make them to files, with notes that describe what you changed and why.
 You can then peruse this history and retrieve previosuly
-saved versions of any file.  
+saved versions of any file.
 
 All of the EEG data, and files derrived thereof should be excluded from
 version control (because the files are so large), and should be
 stored under `eeg_data`. Any instructions for recreating the processed
-eeg files are contained in this README.md, so to retriev a specific version
-of the EEG analysis, one need only follow the directions below
+eeg files are contained in this README.md, so to retrieve a specific version
+of the EEG analysis, the hope is that one need only follow the directions below
 (under [data anlaysis](#data-analysis)).
 
 # Running the experiment
@@ -70,6 +70,27 @@ the experiment. You can use this number to call `run_aba.jl` starting from
 somewhere in the middle of the experiment.
 
 # Data analysis
+
+The follow section provides directions to reproduce the work-in-progress
+analysis.
+
+We have been using BESA for meetings because it is quick and fast to
+run, and allows us to perform sanity checks as we collect subjects. (Are we
+collecting good data? Does it even make sense?)
+
+In the background we have also been working on an eeglab analysis. The eeglab
+anlaysis has been performed with a few goals in mind:
+
+1. To learn how to use other tools and get familiar with ICA anlaysis.
+2. It's easier for me personally to code than to sit and use a GUI
+and the more advanced analyses we'd like to do are easier to script than
+to run manually in BESA.
+3. I have been hoping to calculate measurement errors for each participant so
+that a more modern power analysis can be applied to the data.
+
+So far only goal 1 has really come to fruition: the more advanced analysis
+and the power analysis have yet to be completed (since we're still working on
+removing ICA components in eeglab).
 
 ## Installation and Setup
 
@@ -175,19 +196,40 @@ The batch run will take some time to complete. Go find some other work to do.
 To find a grand average ERP:
 
 1. Open BESA Research
-2. **WORK-IN-PROGRES**
+2. Go to ERP > Combine Conditions, Channels, Find Peaks
+3. Use "Add File" to add files under `eeg_data/study1/BESA/` with the `fsg`
+extension that you desire to average.
+4. Add a `stream2 - stream1` and a `switch - noswitch` target condition under
+"Condition List".
+5. Go to the "Run Script" tab and click "OK".
 
 ### Finding ERPs in eeglab
 
-**TODO**: finish up this pipeline, verify it, and write up the directions here.
+The work in progress eeglab anlayis is located in `preprocess.m`. The idea is
+that you cut and past parts of this script to run in MATLAB. The working
+directory of matlab should be the same as the location of this README file. The
+code up to the ica processing step is working and can be used to generate
+filtered, epoched data with computed ICA components. It takes about 4 hours
+to run on the current 19 participants using my machine.
+
+The goal is to then select components to be rejected (in the resulting
+`eeg_data/study1/eeglab/[sid]_stream12_ica`), save the results, and then
+have the script use those components to generate any means we desired.
+
+Note: I've written a function called `copyica` to transfer a set of calculated
+components from one set of epochs to another. My plan is to use that to use
+the ICA components calculated using the `stream12` epcohs to correct for
+eyeblinks in the `switching` epochs.
 
 ### Finding ERPs with python MNE
 
-There is an incomplete, unworking analysis of the EEG data in
-[python-mne](https://martinos.org/mne/stable/index.html)
-under `anlaysis/eeg/old`. What remains to get this working is better rejection
-of artifacts. This should be possible following a procedure similar to that
-described for eeglab. Good luck!
+There is an incomplete, almost working analysis of the EEG data in
+[python-mne](https://martinos.org/mne/stable/index.html) under
+`anlaysis/eeg/old`. What remains to get this working completely is better
+rejection of artifacts. This should be possible following a procedure similar to
+that described for eeglab. It is faster and has a better programming interface
+than eeglab, and has a number of source analysis methods that I believe eeglab
+lacks. However, it's documentation is much worse. Good luck!
 
 ## Analysis of Behavior
 
@@ -197,4 +239,4 @@ to the `plots` folder). Before running these, you must extra
 you've extracted events you can open any of the behavioral anlaysis files in R
 and run them (from the `analysis/behavior`) to re-generate graphs (or add new
 participants after collecting further data). Each file contains a description of
-the graphs it produces **TODO**.
+the graphs it produces.
