@@ -9,11 +9,31 @@ include("stimtrak.jl")
 version = v"0.1.0"
 sid,trial_skip,deviant = @read_args("ABA study",deviant=[:ripple,:flash])
 
-randomize_by(sid * string(deviant))
+randomize_by(sid + string(deviant))
+
+experiment = Experiment(
+  columns = [
+    :sid => sid,
+    :condition => "study2",
+    :deviant => string(deviant),
+    :version => version,
+    :separation => medium_str,
+    :stimulus,:stimtrak
+  ],
+  data_dir=joinpath("..","data","csv"),
+  skip=trial_skip,
+  # extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
+  #             @Cedrus()],
+  moment_resolution=moment_resolution,
+)
 ################################################################################
 # settings
 
 const st = 1/12
+
+const stream_1 = key"q"
+const stream_2 = key"p"
+const end_break_key = key":space:"
 
 low = 3st
 medium = 6st
@@ -44,22 +64,6 @@ n_trials = 30
 
 ################################################################################
 # experiment and trial definitions
-
-experiment = Experiment(
-  columns = [
-    :sid => sid,
-    :condition => "study2",
-    :deviant => string(deviant),
-    :version => version,
-    :separation => medium_str,
-    :stimulus,:stimtrak
-  ],
-  data_dir=joinpath("..","data","csv"),
-  skip=trial_skip,
-  # extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
-  #             @Cedrus()],
-  moment_resolution=moment_resolution,
-)
 
 function aba(steps)
   A = ramp(tone(A_freq,tone_len))
