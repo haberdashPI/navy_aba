@@ -19,8 +19,24 @@ pwr.t.test(d=d,power=0.8,type="paired")
 
 msd = sediff * sqrt(21)
 
-## meta-analysis of ERP effect sizes
+## TODO:
+
+## 1. collect effect sizes for various meta-analyses (not as relevant but
+## based on more data) plus any effects from more directly relevant studies.
+
+## 2. determine some inflation estimate for the effects of directly relevant
+## studies (e.g. based on that recent Science article examining replications
+## across psychology). Adjust the directly releveant study effects based on this
+## estimate.
+
+## 3. Use the resulting effect sizes to select a range of plausible effect
+## sizes for the current study.
+
+# WIP: effect sizes (Cohen's D) collected so far:
+
 D = c()
+
+###### P300
 # Bramon, E., Rabe-Hesketh, S., Sham, P., Murray, R. M., & Frangou,
 # S. (2004). Meta-analysis of the P300 and P50 waveforms in
 # schizophrenia. Schizophrenia research, 70(2), 315-329.
@@ -31,13 +47,29 @@ D[1] = 0.85
 # 55.
 D[2] = 0.35
 
+# Polich, J. (1996). Meta‐analysis of P300 normative aging
+# studies. Psychophysiology, 33(4), 334-353.
+D[4] = 1.27
+
+######## MMN
+
 # Umbricht, D., & Krljes, S. (2005). Mismatch negativity in schizophrenia: a
 # meta-analysis. Schizophrenia research, 76(1), 1-23.
 D[3] = 0.99
 
-# Polich, J. (1996). Meta‐analysis of P300 normative aging
-# studies. Psychophysiology, 33(4), 334-353.
-D[4] = 1.27
+####### Intermittant studies of Bi-stability
+
+# TODO:
+
+####### Streaming
+
+# TODO:
+
+## this function is from:
+
+# Gelman, A., & Carlin, J. (2014). Beyond Power Calculations Assessing Type S
+# (Sign) and Type M (Magnitude) Errors. Perspectives on Psychological Science,
+# 9(6), 641–651. https://doi.org/10.1177/1745691614551642
 
 retrodesign <- function(A, s, alpha=.05, df=Inf, n.sims=10000){
   z <- qt(1-alpha/2, df)
@@ -51,15 +83,12 @@ retrodesign <- function(A, s, alpha=.05, df=Inf, n.sims=10000){
   return(list(power=power, typeS=typeS, exaggeration=exaggeration))
 }
 
-## based on lowest hypothetical effect size
-retrodesign(0.1*min(D)*msd,sediff,df=13)
-retrodesign(0.5*min(D)*msd,sediff,df=13)
+## TODO: calculate type S errors and exaggeration ratio with lowest, median and
+## highest plausible effect size, for a variety of N
 retrodesign(min(D)*msd,sediff,df=13)
 retrodesign(median(D)*msd,sediff,df=13)
 retrodesign(max(D)*msd,sediff,df=13)
 
-retrodesign(0.1*min(D)*msd,sediff,df=20)
-retrodesign(0.5*min(D)*msd,sediff,df=20)
 retrodesign(min(D)*msd,sediff,df=20)
 retrodesign(median(D)*msd,sediff,df=20)
 retrodesign(max(D)*msd,sediff,df=20)
