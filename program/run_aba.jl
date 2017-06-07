@@ -217,7 +217,7 @@ setup(experiment) do
   """)
   addbreak(message,await_response(iskeydown(end_break_key)))
 
-  addbreak(moment(display,joinpath("Images","navy_aba_03.png")),
+  addbreak(moment(display,joinpath("Images","navy_aba_04.png")),
     await_response(iskeydown(end_break_key)))
 
   addbreak(moment(display,"Wait for the experiment to press continue..."),
