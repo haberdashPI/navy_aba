@@ -3,22 +3,40 @@
 # STUDY 1: Intermittent presentation of ABA- pattern
 
 using Weber
-include("calibrate.jl")
 include("stimtrak.jl")
+include("calibrate.jl")
 
-version = v"0.3.1"
+version = v"0.3.2"
 sid,trial_skip =
   @read_args("Runs an intermittant aba ``experiment, version $version.")
+
+experiment = Experiment(
+  columns = [
+    :sid => sid,
+    :condition => "study1",
+    :version => version,
+    :stimulus,:phase,:stimtrak
+  ],
+  data_dir=joinpath("..","data","csv"),
+  skip=trial_skip,
+  extensions = [@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
+                @Cedrus()],
+  moment_resolution=moment_resolution,
+)
+
 
 ################################################################################
 # settings
 
 const st = 1/12
 
+const stream_1 = key":cedrus5:"
+const stream_2 = key":cedrus6:"
+const end_break_key = key"`"
+
 low = 3st
 medium = 6st
 high = 18st
-medium_str = "6st"
 
 tone_len = 73ms
 tone_SOA = 175ms
@@ -37,21 +55,6 @@ n_repeat_example = 20
 
 ################################################################################
 # experiment and trial definitions
-
-experiment = Experiment(
-  columns = [
-    :sid => sid,
-    :condition => "study1",
-    :version => version,
-    :separation => medium_str,
-    :stimulus,:phase,:stimtrak
-  ],
-  data_dir=joinpath("..","data","csv"),
-  skip=trial_skip,
-  extensions=[@DAQmx(stimtrak_port,codes=stimtrak_codes,eeg_sample_rate=512),
-              @Cedrus()],
-  moment_resolution=moment_resolution,
-)
 
 function aba(step,tone_len,tone_SOA,aba_SOA,repeat)
   A = ramp(tone(A_freq,tone_len))
