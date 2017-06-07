@@ -45,13 +45,13 @@ To install the expeirment:
    and unzip this project.
 2. Follow the directions to
    [install Juno](https://github.com/JunoLab/uber-juno/blob/master/setup.md)
-3. Open the setup.jl file for this project in Juno.
-4. Run setup.jl in Juno (e.g. Julia > Run File).
+3. Open the setup.jl file for this project in Atom.
+4. Run setup.jl in Atom (e.g. Julia > Run File).
 5. call `using Weber` to verify the installation (you may need to restart Julia).
 
 To run the experiment:
 
-1. Open Juno
+1. Open Atom
 2. Open the console (Julia > Open Console)
 3. Change the working directory to the `program` folder - to do this open a file
 in that folder, then go to the menu itme Julia > Working Directory > Current
