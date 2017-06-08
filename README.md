@@ -156,7 +156,7 @@ The first step for eeg anlaysis is extracting the events from the bdfs. This
 process will create an event file that can be loaded in BESA research, and
 another that can be loaded in eeglab. To do so, run
 `analysis/eeg/extract_events.py` and `analysis/eeg/clean_events.R`.
-Read the directions above under [installation and setup](installation-and-setup)
+Read the directions above under [installation and setup](#installation-and-setup)
 for running `setup.py` and `setup.R` for how to run scripts in python and R.
 
 Once you have extracted events, there are two working approaches for finding ERPs.
