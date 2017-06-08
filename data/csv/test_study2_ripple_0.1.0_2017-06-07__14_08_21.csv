@@ -1,0 +1,14 @@
+weber_version,start_date,start_time,offset,trial,time,sid,condition,deviant,version,code,stimulus,stimtrak,value
+0.5.3,2017-06-07,14:08:21,1,0,0.00967282650526613,test,study2,ripple,0.1.0,break_start,,,
+0.5.3,2017-06-07,14:08:21,3,0,0.33267988727311604,test,study2,ripple,0.1.0,break_start,,,
+0.5.3,2017-06-07,14:08:21,4,1,166.41273102255946,test,study2,ripple,0.1.0,trial_start,,,
+0.5.3,2017-06-07,14:08:21,4,1,166.41349394650024,test,study2,ripple,0.1.0,experiment_start,,,
+0.5.3,2017-06-07,14:08:21,4,1,187.57181292511814,test,study2,ripple,0.1.0,ripple,,,2
+0.5.3,2017-06-07,14:08:21,4,1,193.34937811434793,test,study2,ripple,0.1.0,ripple,,,2
+0.5.3,2017-06-07,14:08:21,4,1,196.2327605131577,test,study2,ripple,0.1.0,ripple,,,1
+0.5.3,2017-06-07,14:08:21,4,1,199.11276078685478,test,study2,ripple,0.1.0,ripple,,,1
+0.5.3,2017-06-07,14:08:21,4,1,205.35433997100336,test,study2,ripple,0.1.0,ripple,,,1
+0.5.3,2017-06-07,14:08:21,4,1,209.1974105631234,test,study2,ripple,0.1.0,ripple,,,1
+0.5.3,2017-06-07,14:08:21,4,1,220.88830348635383,test,study2,ripple,0.1.0,paused,,,
+0.5.3,2017-06-07,14:08:21,4,1,221.7672640053206,test,study2,ripple,0.1.0,terminated,,,
+0.5.3,2017-06-07,14:08:21,4,1,221.7672640053206,test,study2,ripple,0.1.0,closed,,,
