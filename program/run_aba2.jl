@@ -97,7 +97,8 @@ function a_trial(trial_num)
     if isdeviant
       if deviant == :flash
         [moment(aba_SOA,play,an_aba),
-         moment(display,visual(colorant"red",duration=300ms))]
+         moment(display,visual(colorant"red",duration=300ms)),
+         moment(record,"flash",value=ripple_index)]
       elseif deviant == :ripple
         ripple_index = ripple_order[trial_num+count]
         count += 1
